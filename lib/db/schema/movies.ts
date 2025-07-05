@@ -16,3 +16,5 @@ export const movies = pgTable("movies", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type Movie = typeof movies.$inferSelect;

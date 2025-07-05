@@ -1,4 +1,7 @@
+"use client";
+
 import { Movie } from "@/lib/db/schema";
+import { getSearchResults } from "@/lib/tvdb/generated";
 import Link from "next/link";
 
 interface MovieCardProps {
@@ -14,6 +17,19 @@ export function MovieCard({ movie }: MovieCardProps) {
       day: "numeric",
     }
   );
+
+  const handleGetTVDBData = async () => {
+    const results = await getSearchResults({
+      query: {
+        query: movie.title,
+        year: movie.releaseYear || undefined,
+        type: "movie",
+        limit: 1,
+      },
+    });
+
+    console.log(results.data?.data);
+  };
 
   return (
     <div className="group relative rounded-lg border border-neutral-200 bg-white p-4 transition-all hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700">
@@ -55,6 +71,7 @@ export function MovieCard({ movie }: MovieCardProps) {
               </svg>
             </Link>
           )}
+          <button onClick={handleGetTVDBData}>Get TVDB Data</button>
         </div>
       </div>
     </div>

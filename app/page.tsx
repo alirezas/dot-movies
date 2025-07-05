@@ -20,7 +20,7 @@ export default async function Home() {
             key={movie.id}
             movie={{
               ...movie,
-              watchedDate: new Date(movie.watchedDate),
+              watchedDate: new Date(movie.watchedDate).toISOString(),
             }}
           />
         ))}

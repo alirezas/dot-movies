@@ -1,6 +1,8 @@
+import { MovieExtendedRecord } from "@/lib/tvdb/generated";
 import {
   date,
   integer,
+  jsonb,
   pgTable,
   serial,
   text,
@@ -13,6 +15,7 @@ export const movies = pgTable("movies", {
   releaseYear: integer("release_year"),
   letterboxdUrl: text("letterboxd_url"),
   watchedDate: date("watched_date").notNull(),
+  tvdbData: jsonb("tvdb_data").$type<MovieExtendedRecord>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

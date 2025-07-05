@@ -15,6 +15,13 @@
       "when": 1751564868135,
       "tag": "0001_mushy_medusa",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751729365334,
+      "tag": "0002_chief_risque",
+      "breakpoints": true
     }
   ]
 }

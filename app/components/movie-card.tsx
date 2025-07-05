@@ -1,14 +1,19 @@
 "use client";
 
+import { updateMovieData } from "@/actions/update-movie-data";
 import { Movie } from "@/lib/db/schema";
-import { getSearchResults } from "@/lib/tvdb/generated";
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface MovieCardProps {
   movie: Movie;
 }
 
 export function MovieCard({ movie }: MovieCardProps) {
+  const router = useRouter();
+
   const formattedDate = new Date(movie.watchedDate).toLocaleDateString(
     "en-US",
     {
@@ -19,21 +24,26 @@ export function MovieCard({ movie }: MovieCardProps) {
   );
 
   const handleGetTVDBData = async () => {
-    const results = await getSearchResults({
-      query: {
-        query: movie.title,
-        year: movie.releaseYear || undefined,
-        type: "movie",
-        limit: 1,
-      },
-    });
-
-    console.log(results.data?.data);
+    try {
+      await updateMovieData(movie, movie.id);
+      toast.success("TVDB data updated");
+      router.refresh();
+    } catch (error) {
+      toast.error("Error getting TVDB data");
+    }
   };
 
   return (
-    <div className="group relative rounded-lg border border-neutral-200 bg-white p-4 transition-all hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700">
+    <div className="">
       <div className="flex flex-col gap-2">
+        <Image
+          src={movie.tvdbData?.image || "/placeholder.svg"}
+          alt={movie.title}
+          width={200}
+          height={600}
+          className="aspect-2/3 object-cover rounded-lg"
+        />
+
         <div className="flex items-start justify-between">
           <h3 className="font-medium text-neutral-900 dark:text-neutral-100">
             {movie.title}
@@ -71,7 +81,12 @@ export function MovieCard({ movie }: MovieCardProps) {
               </svg>
             </Link>
           )}
-          <button onClick={handleGetTVDBData}>Get TVDB Data</button>
+          <button
+            onClick={handleGetTVDBData}
+            className="mt-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            Get TVDB Data
+          </button>
         </div>
       </div>
     </div>

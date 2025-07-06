@@ -50,7 +50,7 @@ export function MovieCard({ movie }: MovieCardProps) {
         fill
         className="object-cover z-0"
       />
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/60 to-background/0 p-2 pt-6 text-sm z-10">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/60 to-background/0 p-2 pt-6 text-sm z-10 text-shadow-xs">
         <h2 className="font-semibold truncate">{movie.title}</h2>
         <span className="opacity-80 text-xs">({movie.releaseYear})</span>
       </div>

@@ -1,0 +1,1 @@
+ALTER TABLE "movies" ALTER COLUMN "watched_date" DROP NOT NULL;

@@ -15,14 +15,13 @@ interface MovieCardProps {
 export function MovieCard({ movie }: MovieCardProps) {
   const router = useRouter();
 
-  const formattedDate = new Date(movie.watchedDate).toLocaleDateString(
-    "en-US",
-    {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }
-  );
+  const formattedDate = movie.watchedDate
+    ? new Date(movie.watchedDate).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
 
   const handleGetTVDBData = async () => {
     try {

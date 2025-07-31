@@ -3,6 +3,7 @@
 import { updateMovieData } from "@/actions/update-movie-data";
 import { Movie } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
+import { EyeIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -49,6 +50,14 @@ export function MovieCard({ movie }: MovieCardProps) {
         fill
         className="object-cover z-0"
       />
+
+      {/* Watched indicator */}
+      {movie.watchedDate && (
+        <div className="absolute top-4 right-4 z-20 size-6 rounded grid place-items-center bg-amber-500/20">
+          <EyeIcon className="size-4 text-amber-500" />
+        </div>
+      )}
+
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/60 to-background/0 p-2 pt-6 text-sm z-10 text-shadow-xs">
         <h2 className="font-semibold truncate">{movie.title}</h2>
         <span className="opacity-80 text-xs">({movie.releaseYear})</span>

@@ -3,66 +3,49 @@ import { movies } from "@/lib/db/schema/movies";
 import { desc, isNotNull, isNull } from "drizzle-orm";
 import Link from "next/link";
 import { MovieCard } from "./components/movie-card";
+import { QuickFilterLinks } from "./components/quick-filter-links";
 
-export default async function Home() {
-  const [watchedMovies, watchlistMovies, watchedCount, watchlistCount] =
-    await Promise.all([
-      db
-        .select()
-        .from(movies)
-        .where(isNotNull(movies.watchedDate))
-        .orderBy(desc(movies.watchedDate))
-        .limit(10),
-      db
-        .select()
-        .from(movies)
-        .where(isNull(movies.watchedDate))
-        .orderBy(desc(movies.createdAt))
-        .limit(10),
-      db
-        .select({ count: movies.id })
-        .from(movies)
-        .where(isNotNull(movies.watchedDate)),
-      db
-        .select({ count: movies.id })
-        .from(movies)
-        .where(isNull(movies.watchedDate)),
-    ]);
+export default async function MoviesPage() {
+  // Get all movies and separate counts
+  const [allMovies, watchedCount, watchlistCount] = await Promise.all([
+    db.select().from(movies).orderBy(desc(movies.releaseYear)), // Show newest added first
+    db
+      .select({ count: movies.id })
+      .from(movies)
+      .where(isNotNull(movies.watchedDate)),
+    db
+      .select({ count: movies.id })
+      .from(movies)
+      .where(isNull(movies.watchedDate)),
+  ]);
 
   const totalWatched = watchedCount.length;
   const totalWatchlist = watchlistCount.length;
+  const totalMovies = allMovies.length;
 
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-          My Movie Diary
-        </h1>
-        <Link
-          href="/movies"
-          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-        >
-          View All Movies ({totalWatched + totalWatchlist})
-        </Link>
+        <div>
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+            All Movies
+          </h1>
+          <div className="mt-2 flex gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+            <span>{totalMovies} total movies</span>
+            <span>•</span>
+            <span>{totalWatched} watched</span>
+            <span>•</span>
+            <span>{totalWatchlist} in watchlist</span>
+          </div>
+        </div>
       </div>
 
-      {/* Watched Movies Section */}
-      <section className="mb-12">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-200">
-            Watched ({totalWatched})
-          </h2>
-          {totalWatched > 10 && (
-            <Link
-              href="/watched"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              View all {totalWatched} movies →
-            </Link>
-          )}
-        </div>
+      {/* Quick filter links */}
+      <QuickFilterLinks currentPath="/" />
+
+      {allMovies.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
-          {watchedMovies.map((movie) => (
+          {allMovies.map((movie) => (
             <MovieCard
               key={movie.id}
               movie={{
@@ -74,45 +57,22 @@ export default async function Home() {
             />
           ))}
         </div>
-        {watchedMovies.length === 0 && (
-          <p className="text-neutral-500 dark:text-neutral-400">
-            No watched movies yet.
-          </p>
-        )}
-      </section>
-
-      {/* Watchlist Section */}
-      <section>
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-200">
-            Watchlist ({totalWatchlist})
+      ) : (
+        <div className="flex flex-col items-center justify-center py-16">
+          <h2 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
+            No movies yet
           </h2>
-          {totalWatchlist > 10 && (
-            <Link
-              href="/watchlist"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              View all {totalWatchlist} movies →
-            </Link>
-          )}
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
-          {watchlistMovies.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={{
-                ...movie,
-                watchedDate: null,
-              }}
-            />
-          ))}
-        </div>
-        {watchlistMovies.length === 0 && (
-          <p className="text-neutral-500 dark:text-neutral-400">
-            No movies in watchlist yet.
+          <p className="text-neutral-500 dark:text-neutral-400 mb-4">
+            Start adding movies to your collection
           </p>
-        )}
-      </section>
+          <Link
+            href="/"
+            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            Go to Home
+          </Link>
+        </div>
+      )}
     </main>
   );
 }

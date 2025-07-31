@@ -3,6 +3,7 @@ import { movies } from "@/lib/db/schema/movies";
 import { desc, isNull } from "drizzle-orm";
 import Link from "next/link";
 import { MovieCard } from "../components/movie-card";
+import { QuickFilterLinks } from "../components/quick-filter-links";
 
 export default async function WatchlistPage() {
   const watchlistMovies = await db
@@ -22,13 +23,10 @@ export default async function WatchlistPage() {
             {watchlistMovies.length} movies to watch
           </p>
         </div>
-        <Link
-          href="/"
-          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-        >
-          ← Back to Home
-        </Link>
       </div>
+
+      {/* Quick filter links */}
+      <QuickFilterLinks currentPath="/watchlist" />
 
       {watchlistMovies.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">

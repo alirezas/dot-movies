@@ -3,10 +3,11 @@
 import { updateMovieData } from "@/actions/update-movie-data";
 import { Movie } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
-import { EyeIcon } from "lucide-react";
+import { EyeIcon, Loader2, RefreshCcw } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface MovieCardProps {
@@ -15,6 +16,7 @@ interface MovieCardProps {
 
 export function MovieCard({ movie }: MovieCardProps) {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const formattedDate = movie.watchedDate
     ? new Date(movie.watchedDate).toLocaleDateString("en-US", {
@@ -26,17 +28,19 @@ export function MovieCard({ movie }: MovieCardProps) {
 
   const handleGetTVDBData = async () => {
     try {
+      setIsLoading(true);
       await updateMovieData(movie, movie.id);
       toast.success("TVDB data updated");
       router.refresh();
     } catch (error) {
       toast.error("Error getting TVDB data");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Link
-      href={`/movie/${movie.id}`}
+    <div
       className={cn(
         ["relative overflow-hidden w-[200px] aspect-2/3 rounded-lg shadow-2xl"],
         [
@@ -44,24 +48,40 @@ export function MovieCard({ movie }: MovieCardProps) {
         ]
       )}
     >
-      <Image
-        src={movie.tvdbData?.image || "/placeholder.svg"}
-        alt={movie.title}
-        fill
-        className="object-cover z-0"
-      />
-
-      {/* Watched indicator */}
-      {movie.watchedDate && (
-        <div className="absolute top-4 right-4 z-20 size-6 rounded grid place-items-center bg-amber-500/20">
-          <EyeIcon className="size-4 text-amber-500" />
-        </div>
-      )}
-
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/60 to-background/0 p-2 pt-6 text-sm z-10 text-shadow-xs">
-        <h2 className="font-semibold truncate">{movie.title}</h2>
-        <span className="opacity-80 text-xs">({movie.releaseYear})</span>
+      <div className="absolute top-4 right-4 z-20 flex gap-2">
+        {/* Watched indicator */}
+        {movie.watchedDate && (
+          <div className="size-6 rounded grid place-items-center bg-amber-500/20">
+            <EyeIcon className="size-4 text-amber-500" />
+          </div>
+        )}
+        {process.env.NODE_ENV === "development" && (
+          <button
+            className="size-6 rounded grid place-items-center bg-blue-500/20"
+            type="button"
+            onClick={handleGetTVDBData}
+          >
+            {isLoading ? (
+              <Loader2 className="size-4 text-blue-500 animate-spin" />
+            ) : (
+              <RefreshCcw className="size-4 text-blue-500" />
+            )}
+          </button>
+        )}
       </div>
-    </Link>
+      <Link href={`/movie/${movie.id}`}>
+        <Image
+          src={movie.tvdbData?.image || "/placeholder.svg"}
+          alt={movie.title}
+          fill
+          className="object-cover z-0"
+        />
+
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/60 to-background/0 p-2 pt-6 text-sm z-10 text-shadow-xs">
+          <h2 className="font-semibold truncate">{movie.title}</h2>
+          <span className="opacity-80 text-xs">({movie.releaseYear})</span>
+        </div>
+      </Link>
+    </div>
   );
 }

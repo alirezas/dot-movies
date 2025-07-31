@@ -7,7 +7,7 @@ import { MovieCard } from "../components/movie-card";
 export default async function MoviesPage() {
   // Get all movies and separate counts
   const [allMovies, watchedCount, watchlistCount] = await Promise.all([
-    db.select().from(movies).orderBy(desc(movies.createdAt)), // Show newest added first
+    db.select().from(movies).orderBy(desc(movies.releaseYear)), // Show newest added first
     db
       .select({ count: movies.id })
       .from(movies)

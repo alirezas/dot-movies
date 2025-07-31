@@ -34,9 +34,17 @@ export default async function Home() {
 
   return (
     <main className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-        My Movie Diary
-      </h1>
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+          My Movie Diary
+        </h1>
+        <Link
+          href="/movies"
+          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+        >
+          View All Movies ({totalWatched + totalWatchlist})
+        </Link>
+      </div>
 
       {/* Watched Movies Section */}
       <section className="mb-12">

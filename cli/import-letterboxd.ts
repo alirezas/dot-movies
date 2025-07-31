@@ -142,11 +142,10 @@ const importData = async (directory: string) => {
     if (watchlistExists) {
       console.log("📖 Parsing watchlist.csv...");
       const watchlistMovies = parseCsvFile(watchlistFile);
-      // For watchlist, we might not have watched dates, so use current date
+      // For watchlist movies, watchedDate should be null since they haven't been watched
       const processedWatchlist = watchlistMovies.map((movie) => ({
         ...movie,
-        watchedDate:
-          movie.watchedDate || new Date().toISOString().split("T")[0],
+        watchedDate: null,
       }));
       allMovies.push(...processedWatchlist);
       console.log(`✅ Found ${watchlistMovies.length} watchlist movies`);

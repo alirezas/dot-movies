@@ -1,21 +1,36 @@
 import { db } from "@/lib/db";
 import { movies } from "@/lib/db/schema/movies";
 import { desc, isNotNull, isNull } from "drizzle-orm";
+import Link from "next/link";
 import { MovieCard } from "./components/movie-card";
 
 export default async function Home() {
-  const [watchedMovies, watchlistMovies] = await Promise.all([
-    db
-      .select()
-      .from(movies)
-      .where(isNotNull(movies.watchedDate))
-      .orderBy(desc(movies.watchedDate)),
-    db
-      .select()
-      .from(movies)
-      .where(isNull(movies.watchedDate))
-      .orderBy(desc(movies.createdAt)),
-  ]);
+  const [watchedMovies, watchlistMovies, watchedCount, watchlistCount] =
+    await Promise.all([
+      db
+        .select()
+        .from(movies)
+        .where(isNotNull(movies.watchedDate))
+        .orderBy(desc(movies.watchedDate))
+        .limit(10),
+      db
+        .select()
+        .from(movies)
+        .where(isNull(movies.watchedDate))
+        .orderBy(desc(movies.createdAt))
+        .limit(10),
+      db
+        .select({ count: movies.id })
+        .from(movies)
+        .where(isNotNull(movies.watchedDate)),
+      db
+        .select({ count: movies.id })
+        .from(movies)
+        .where(isNull(movies.watchedDate)),
+    ]);
+
+  const totalWatched = watchedCount.length;
+  const totalWatchlist = watchlistCount.length;
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -25,9 +40,19 @@ export default async function Home() {
 
       {/* Watched Movies Section */}
       <section className="mb-12">
-        <h2 className="mb-6 text-2xl font-semibold text-neutral-800 dark:text-neutral-200">
-          Watched ({watchedMovies.length})
-        </h2>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-200">
+            Watched ({totalWatched})
+          </h2>
+          {totalWatched > 10 && (
+            <Link
+              href="/watched"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              View all {totalWatched} movies →
+            </Link>
+          )}
+        </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
           {watchedMovies.map((movie) => (
             <MovieCard
@@ -50,9 +75,19 @@ export default async function Home() {
 
       {/* Watchlist Section */}
       <section>
-        <h2 className="mb-6 text-2xl font-semibold text-neutral-800 dark:text-neutral-200">
-          Watchlist ({watchlistMovies.length})
-        </h2>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-200">
+            Watchlist ({totalWatchlist})
+          </h2>
+          {totalWatchlist > 10 && (
+            <Link
+              href="/watchlist"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              View all {totalWatchlist} movies →
+            </Link>
+          )}
+        </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
           {watchlistMovies.map((movie) => (
             <MovieCard

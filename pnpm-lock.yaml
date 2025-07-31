@@ -36,7 +36,7 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
       drizzle-orm:
-        specifier: ^0.44.4
+        specifier: 0.44.4
         version: 0.44.4(@libsql/client@0.15.10)(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(pg@8.16.3)(postgres@3.4.7)
       lucide-react:
         specifier: ^0.525.0

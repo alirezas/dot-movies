@@ -12,6 +12,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:import": "tsx scripts/import-movies.ts",
+    "letterboxd:import": "tsx cli/import-letterboxd.ts",
     "generate:tvdb": "openapi-ts"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "commander": "^14.0.0",
     "csv-parse": "^5.6.0",
     "dotenv-cli": "^8.0.0",
     "drizzle-orm": "^0.44.4",

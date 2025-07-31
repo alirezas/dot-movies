@@ -3,7 +3,6 @@
 import { db } from "@/lib/db";
 import { Movie, movies } from "@/lib/db/schema";
 import { getMovieExtended, getSearchResults } from "@/lib/tvdb/generated";
-import { eq } from "drizzle-orm";
 
 export const updateMovieData = async (movie: Movie, movieId: number) => {
   const searchQuery = await getSearchResults({
@@ -49,7 +48,7 @@ export const updateMovieData = async (movie: Movie, movieId: number) => {
     .set({
       tvdbData: extendedMovieData,
     })
-    .where(eq(movies.id, movieId))
+    .where((table: any, { eq }: any) => eq(table.id, movieId))
     .returning();
 
   return updatedMovie[0];

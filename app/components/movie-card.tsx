@@ -18,14 +18,6 @@ export function MovieCard({ movie }: MovieCardProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const _formattedDate = movie.watchedDate
-    ? new Date(movie.watchedDate).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    : null;
-
   const handleGetTVDBData = async () => {
     try {
       setIsLoading(true);

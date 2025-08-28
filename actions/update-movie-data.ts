@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Movie, movies } from "@/lib/db/schema";
+import { type Movie, movies } from "@/lib/db/schema";
 import { getMovieExtended, getSearchResults } from "@/lib/tvdb/generated";
 import { eq } from "drizzle-orm";
 

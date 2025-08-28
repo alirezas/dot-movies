@@ -1,17 +1,17 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
+
+var __awaiter = (this && this.__awaiter) || ((thisArg, _arguments, P, generator) => {
+    function adopt(value) { return value instanceof P ? value : new P((resolve) => { resolve(value); }); }
+    return new (P || (P = Promise))((resolve, reject) => {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+});
+var __generator = (this && this.__generator) || ((thisArg, body) => {
+    var _ = { label: 0, sent: () => { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
     return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
+    function verb(n) { return (v) => step([n, v]); }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (g && (g = 0, op[0] && (_ = 0)), _) try {
@@ -34,7 +34,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
-};
+});
 Object.defineProperty(exports, "__esModule", { value: true });
 var csv_parse_1 = require("csv-parse");
 var fs_1 = require("fs");
@@ -44,8 +44,7 @@ var movies_1 = require("../lib/db/schema/movies");
 function importMovies() {
     return __awaiter(this, void 0, void 0, function () {
         var csvFilePath, parser, records;
-        var _this = this;
-        return __generator(this, function (_a) {
+        return __generator(this, (_a) => {
             csvFilePath = path_1.default.join(process.cwd(), "data", "watched.csv");
             parser = (0, csv_parse_1.parse)({
                 columns: true,
@@ -54,12 +53,12 @@ function importMovies() {
             records = [];
             (0, fs_1.createReadStream)(csvFilePath)
                 .pipe(parser)
-                .on("data", function (record) {
+                .on("data", (record) => {
                 records.push(record);
             })
-                .on("end", function () { return __awaiter(_this, void 0, void 0, function () {
+                .on("end", () => __awaiter(this, void 0, void 0, function () {
                 var batchSize, i, batch, values, error_1;
-                return __generator(this, function (_a) {
+                return __generator(this, (_a) => {
                     switch (_a.label) {
                         case 0:
                             _a.trys.push([0, 5, , 6]);
@@ -70,12 +69,12 @@ function importMovies() {
                         case 1:
                             if (!(i < records.length)) return [3 /*break*/, 4];
                             batch = records.slice(i, i + batchSize);
-                            values = batch.map(function (record) { return ({
+                            values = batch.map((record) => ({
                                 title: record.Name,
                                 releaseYear: parseInt(record.Year),
                                 letterboxdUrl: record["Letterboxd URI"],
                                 watchedDate: record.Date, // Pass the date as string, Drizzle will handle the conversion
-                            }); });
+                            }));
                             return [4 /*yield*/, db_1.db.insert(movies_1.movies).values(values)];
                         case 2:
                             _a.sent();
@@ -96,7 +95,7 @@ function importMovies() {
                         case 6: return [2 /*return*/];
                     }
                 });
-            }); });
+            }));
             return [2 /*return*/];
         });
     });

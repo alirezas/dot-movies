@@ -21,7 +21,7 @@ const getToken = async (): Promise<string | null> => {
 
 export const createClientConfig: CreateClientConfig = (config) => ({
   ...config,
-  auth: async (auth) => {
+  auth: async () => {
     const token = await getToken();
 
     if (!token) {

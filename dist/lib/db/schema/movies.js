@@ -1,4 +1,4 @@
-"use strict";
+
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.movies = void 0;
 var pg_core_1 = require("drizzle-orm/pg-core");

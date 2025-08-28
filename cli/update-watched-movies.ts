@@ -4,7 +4,7 @@ import { Command } from "commander";
 import { and, isNotNull, isNull } from "drizzle-orm";
 import { updateMovieData } from "../actions/update-movie-data";
 import { db } from "../lib/db/index";
-import { Movie, movies } from "../lib/db/schema/movies";
+import { type Movie, movies } from "../lib/db/schema/movies";
 
 const fetchWatchedMoviesWithoutTVDBData = async (): Promise<Movie[]> => {
   console.log("🔍 Fetching watched movies without TVDB data...");

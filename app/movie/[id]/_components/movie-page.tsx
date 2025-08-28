@@ -1,6 +1,6 @@
 "use client";
 
-import { Movie } from "@/lib/db/schema";
+import type { Movie } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useEffect, useState } from "react";

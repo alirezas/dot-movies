@@ -1,4 +1,4 @@
-import { MovieExtendedRecord } from "@/lib/tvdb/generated";
+import type { MovieExtendedRecord } from "@/lib/tvdb/generated";
 import {
   date,
   integer,

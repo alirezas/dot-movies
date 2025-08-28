@@ -2,10 +2,10 @@
 
 import { Command } from "commander";
 import { parse } from "csv-parse/sync";
-import { existsSync, readFileSync } from "fs";
-import { join } from "path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { db } from "../lib/db/index";
-import { Movie, movies } from "../lib/db/schema/movies";
+import { type Movie, movies } from "../lib/db/schema/movies";
 
 type MovieRecord = Movie;
 
@@ -18,9 +18,10 @@ const parseCsvFile = (filePath: string): MovieRecord[] => {
       trim: true,
     });
 
+    // biome-ignore lint/suspicious/noExplicitAny: not fixable
     return records.map((record: any) => ({
       title: record.Name || record.name,
-      releaseYear: parseInt(record.Year || record.year),
+      releaseYear: parseInt(record.Year || record.year, 10),
       letterboxdUrl:
         record["Letterboxd URI"] || record.letterboxd_uri || record.uri,
       watchedDate: record.Date || record.date,
@@ -43,7 +44,7 @@ const loadExistingMovies = async (): Promise<Set<string>> => {
     // Create a Set with "title|year" format for fast lookups
     const movieKeys = new Set<string>(
       existing.map(
-        (movie: { title: string; releaseYear: number }) =>
+        (movie: { title: string; releaseYear: number | null }) =>
           `${movie.title}|${movie.releaseYear}`
       )
     );
@@ -128,7 +129,7 @@ const importData = async (directory: string) => {
       process.exit(1);
     }
 
-    let allMovies: MovieRecord[] = [];
+    const allMovies: MovieRecord[] = [];
 
     // Parse watched.csv
     if (watchedExists) {
@@ -176,7 +177,7 @@ const importData = async (directory: string) => {
       // Check if movie already exists (fast in-memory lookup)
       const exists = checkIfMovieExists(
         movie.title,
-        movie.releaseYear,
+        movie.releaseYear ?? 0,
         existingMovies
       );
 

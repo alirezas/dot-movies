@@ -1,7 +1,7 @@
 "use client";
 
 import { updateMovieData } from "@/actions/update-movie-data";
-import { Movie } from "@/lib/db/schema";
+import type { Movie } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 import { EyeIcon, Loader2, RefreshCcw } from "lucide-react";
 import Image from "next/image";
@@ -18,7 +18,7 @@ export function MovieCard({ movie }: MovieCardProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const formattedDate = movie.watchedDate
+  const _formattedDate = movie.watchedDate
     ? new Date(movie.watchedDate).toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
@@ -32,7 +32,7 @@ export function MovieCard({ movie }: MovieCardProps) {
       await updateMovieData(movie, movie.id);
       toast.success("TVDB data updated");
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error("Error getting TVDB data");
     } finally {
       setIsLoading(false);

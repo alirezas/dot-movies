@@ -1,47 +1,32 @@
-import { desc, isNotNull } from "drizzle-orm";
+import {
+  getMovieCounts,
+  getWatchedMoviesPaginated,
+} from "@/lib/queries/movies";
 import Link from "next/link";
-import { db } from "@/lib/db";
-import { movies } from "@/lib/db/schema/movies";
-import { MovieCard } from "../components/movie-card";
-import { QuickFilterLinks } from "../components/quick-filter-links";
+import { Suspense } from "react";
+import { QuickFilterLinks } from "../../components/quick-filter-links";
+import { WatchedMoviesList } from "../../components/watched-movies-list";
 
-export default async function WatchedPage() {
-  const watchedMovies = await db
-    .select()
-    .from(movies)
-    .where(isNotNull(movies.watchedDate))
-    .orderBy(desc(movies.watchedDate));
+async function WatchedCount() {
+  const counts = await getMovieCounts();
+  return (
+    <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+      {counts.watched} movies watched
+    </p>
+  );
+}
+
+async function WatchedMoviesContent() {
+  const [counts, initialMovies] = await Promise.all([
+    getMovieCounts(),
+    getWatchedMoviesPaginated(0, 20),
+  ]);
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-            Watched Movies
-          </h1>
-          <p className="mt-2 text-neutral-600 dark:text-neutral-400">
-            {watchedMovies.length} movies watched
-          </p>
-        </div>
-      </div>
-
-      {/* Quick filter links */}
-      <QuickFilterLinks currentPath="/watched" />
-
-      {watchedMovies.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
-          {watchedMovies.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={{
-                ...movie,
-                watchedDate: movie.watchedDate
-                  ? new Date(movie.watchedDate).toISOString()
-                  : null,
-              }}
-            />
-          ))}
-        </div>
+    <>
+      <QuickFilterLinks currentPath="/watched" counts={counts} />
+      {initialMovies.length > 0 ? (
+        <WatchedMoviesList initialMovies={initialMovies} />
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <h2 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
@@ -58,6 +43,41 @@ export default async function WatchedPage() {
           </Link>
         </div>
       )}
+    </>
+  );
+}
+
+export default function WatchedPage() {
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+            Watched Movies
+          </h1>
+          <Suspense
+            fallback={
+              <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+                Loading...
+              </p>
+            }
+          >
+            <WatchedCount />
+          </Suspense>
+        </div>
+      </div>
+
+      <Suspense
+        fallback={
+          <div className="flex justify-center py-16">
+            <div className="text-neutral-600 dark:text-neutral-400">
+              Loading movies...
+            </div>
+          </div>
+        }
+      >
+        <WatchedMoviesContent />
+      </Suspense>
     </main>
   );
 }

@@ -21,20 +21,30 @@ export const updateMovieData = async (movie: Movie, movieId: number) => {
     throw new Error("No movie found");
   }
 
-  if (
-    searchResult.name !== movie.title ||
-    searchResult.year !== movie.releaseYear?.toString()
-  ) {
+  // Year must match (within 1 year tolerance for edge cases)
+  const searchYear = Number(searchResult.year);
+  const movieYear = movie.releaseYear;
+  const yearMatches =
+    !movieYear ||
+    !searchResult.year ||
+    searchYear === movieYear ||
+    Math.abs(searchYear - movieYear) <= 1;
+
+  // If year matches, trust the API result (titles can be in different languages/scripts)
+  // The API might return the original language title (e.g., Persian, Arabic) which is fine
+  if (!yearMatches) {
     throw new Error(
       `${movie.title} (${movie.releaseYear})` +
         ` - ${searchResult.name} (${searchResult.year})` +
-        " - Movie data mismatch"
+        " - Year mismatch"
     );
   }
 
+  const tvdbId = Number(searchResult.id?.split("-")[1]);
+
   const extendedMovieQuery = await getMovieExtended({
     path: {
-      id: Number(searchResult.id?.split("-")[1]),
+      id: tvdbId,
     },
   });
 

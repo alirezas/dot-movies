@@ -38,14 +38,47 @@ const createProgressBar = (
   return `[${filledBar}${emptyBar}] ${percentage}% (${current}/${total})`;
 };
 
+const clearTerminal = () => {
+  process.stdout.write("\x1B[2J\x1B[0f");
+};
+
+let errorLinesCount = 0;
+
+const writeErrorBelow = (message: string) => {
+  // Write error on a new line below progress bar
+  process.stdout.write(`\n${message}`);
+  errorLinesCount++;
+};
+
+const getProgressBarPosition = () => {
+  // Move cursor up by number of error lines to get back to progress bar line
+  if (errorLinesCount > 0) {
+    process.stdout.write(`\x1B[${errorLinesCount}A`);
+  }
+};
+
 const updateProgressLine = (message: string) => {
-  process.stdout.clearLine(0);
-  process.stdout.cursorTo(0);
+  // Move back to progress bar line if errors were written
+  getProgressBarPosition();
+
+  if (
+    typeof process.stdout.clearLine === "function" &&
+    typeof process.stdout.cursorTo === "function"
+  ) {
+    process.stdout.clearLine(0);
+    process.stdout.cursorTo(0);
+  }
   process.stdout.write(message);
+
+  // Move back down to end of output
+  if (errorLinesCount > 0) {
+    process.stdout.write(`\x1B[${errorLinesCount}B`);
+  }
 };
 
 const updateMovies = async () => {
   try {
+    clearTerminal();
     console.log("🎬 TVDB Watchlist Data Updater\n");
 
     // Fetch movies that need updating
@@ -56,10 +89,12 @@ const updateMovies = async () => {
       return;
     }
 
-    console.log(`\n🎯 Processing ${moviesToUpdate.length} movies...\n`);
+    console.log(`🎯 Processing ${moviesToUpdate.length} movies...\n`);
 
     let updated = 0;
     let failed = 0;
+    const errors: string[] = [];
+    errorLinesCount = 0; // Reset error line counter
 
     // Process each movie
     for (let i = 0; i < moviesToUpdate.length; i++) {
@@ -78,23 +113,35 @@ const updateMovies = async () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
       } catch (error) {
         failed++;
-        // Log error but continue processing
-        console.error(
-          `\n❌ Failed to update ${movie.title} (${movie.releaseYear}):`,
+        const errorMsg = `❌ Failed to update ${movie.title} (${movie.releaseYear}): ${
           error instanceof Error ? error.message : "Unknown error"
-        );
+        }`;
+        errors.push(errorMsg);
+        // Write error below progress bar
+        writeErrorBelow(errorMsg);
       }
     }
 
     // Clear progress line and show final results
-    process.stdout.clearLine(0);
-    process.stdout.cursorTo(0);
+    if (
+      typeof process.stdout.clearLine === "function" &&
+      typeof process.stdout.cursorTo === "function"
+    ) {
+      process.stdout.clearLine(0);
+      process.stdout.cursorTo(0);
+    } else {
+      process.stdout.write("\n");
+    }
 
-    console.log("✅ Update Complete!\n");
+    console.log("\n✅ Update Complete!");
     console.log(`📊 Results:`);
     console.log(`   Total processed: ${moviesToUpdate.length}`);
     console.log(`   🟢 Updated: ${updated}`);
     console.log(`   🔴 Failed: ${failed}`);
+
+    if (errors.length > 0) {
+      console.log(`\n❌ Errors:\n${errors.join("\n")}`);
+    }
   } catch (err) {
     console.error(
       "\n❌ Error:",

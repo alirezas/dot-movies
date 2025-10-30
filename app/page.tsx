@@ -1,65 +1,33 @@
-import { desc, isNotNull, isNull } from "drizzle-orm";
+import { getMovieCounts, getMoviesPaginated } from "@/lib/queries/movies";
 import Link from "next/link";
-import { db } from "@/lib/db";
-import { movies } from "@/lib/db/schema/movies";
-import { MovieCard } from "./components/movie-card";
-import { QuickFilterLinks } from "./components/quick-filter-links";
+import { Suspense } from "react";
+import { MoviesList } from "../components/movies-list";
+import { QuickFilterLinks } from "../components/quick-filter-links";
 
-export default async function MoviesPage() {
-  // Get all movies and separate counts
-  const [allMovies, watchedCount, watchlistCount] = await Promise.all([
-    db
-      .select()
-      .from(movies)
-      .orderBy(desc(movies.releaseYear)), // Show newest added first
-    db
-      .select({ count: movies.id })
-      .from(movies)
-      .where(isNotNull(movies.watchedDate)),
-    db
-      .select({ count: movies.id })
-      .from(movies)
-      .where(isNull(movies.watchedDate)),
+async function MovieCounts() {
+  const counts = await getMovieCounts();
+  return (
+    <div className="mt-2 flex gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+      <span>{counts.total} total movies</span>
+      <span>•</span>
+      <span>{counts.watched} watched</span>
+      <span>•</span>
+      <span>{counts.watchlist} in watchlist</span>
+    </div>
+  );
+}
+
+async function MoviesContent() {
+  const [counts, initialMovies] = await Promise.all([
+    getMovieCounts(),
+    getMoviesPaginated(0, 20),
   ]);
 
-  const totalWatched = watchedCount.length;
-  const totalWatchlist = watchlistCount.length;
-  const totalMovies = allMovies.length;
-
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-            All Movies
-          </h1>
-          <div className="mt-2 flex gap-4 text-sm text-neutral-600 dark:text-neutral-400">
-            <span>{totalMovies} total movies</span>
-            <span>•</span>
-            <span>{totalWatched} watched</span>
-            <span>•</span>
-            <span>{totalWatchlist} in watchlist</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick filter links */}
-      <QuickFilterLinks currentPath="/" />
-
-      {allMovies.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
-          {allMovies.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={{
-                ...movie,
-                watchedDate: movie.watchedDate
-                  ? new Date(movie.watchedDate).toISOString()
-                  : null,
-              }}
-            />
-          ))}
-        </div>
+    <>
+      <QuickFilterLinks currentPath="/" counts={counts} />
+      {initialMovies.length > 0 ? (
+        <MoviesList initialMovies={initialMovies} />
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <h2 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
@@ -76,6 +44,41 @@ export default async function MoviesPage() {
           </Link>
         </div>
       )}
+    </>
+  );
+}
+
+export default function MoviesPage() {
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+            All Movies
+          </h1>
+          <Suspense
+            fallback={
+              <div className="mt-2 flex gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+                <span>Loading...</span>
+              </div>
+            }
+          >
+            <MovieCounts />
+          </Suspense>
+        </div>
+      </div>
+
+      <Suspense
+        fallback={
+          <div className="flex justify-center py-16">
+            <div className="text-neutral-600 dark:text-neutral-400">
+              Loading movies...
+            </div>
+          </div>
+        }
+      >
+        <MoviesContent />
+      </Suspense>
     </main>
   );
 }

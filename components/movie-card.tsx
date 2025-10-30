@@ -1,14 +1,14 @@
 "use client";
 
+import { updateMovieData } from "@/actions/update-movie-data";
+import type { Movie } from "@/lib/db/schema";
+import { cn } from "@/lib/utils";
 import { EyeIcon, Loader2, RefreshCcw } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { updateMovieData } from "@/actions/update-movie-data";
-import type { Movie } from "@/lib/db/schema";
-import { cn } from "@/lib/utils";
 
 interface MovieCardProps {
   movie: Movie;

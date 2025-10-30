@@ -1,13 +1,19 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
 import { Command } from "commander";
 import { parse } from "csv-parse/sync";
+import { eq } from "drizzle-orm";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { db } from "../lib/db/index";
-import { type Movie, movies } from "../lib/db/schema/movies";
+import { movies } from "../lib/db/schema/movies";
 
-type MovieRecord = Movie;
+type MovieRecord = {
+  title: string;
+  releaseYear: number | null;
+  letterboxdUrl: string | null;
+  watchedDate: string | null;
+};
 
 const parseCsvFile = (filePath: string): MovieRecord[] => {
   try {
@@ -19,50 +25,58 @@ const parseCsvFile = (filePath: string): MovieRecord[] => {
     });
 
     // biome-ignore lint/suspicious/noExplicitAny: not fixable
-    return records.map((record: any) => ({
-      title: record.Name || record.name,
-      releaseYear: parseInt(record.Year || record.year, 10),
-      letterboxdUrl:
-        record["Letterboxd URI"] || record.letterboxd_uri || record.uri,
-      watchedDate: record.Date || record.date,
-    }));
+    return records.map((record: any) => {
+      const year = record.Year || record.year;
+      const parsedYear = year ? parseInt(year, 10) : NaN;
+      return {
+        title: record.Name || record.name,
+        releaseYear: Number.isNaN(parsedYear) ? null : parsedYear,
+        letterboxdUrl:
+          record["Letterboxd URI"] || record.letterboxd_uri || record.uri,
+        watchedDate: record.Date || record.date,
+      };
+    });
   } catch (err) {
     throw new Error(`Failed to parse CSV file ${filePath}: ${err}`);
   }
 };
 
-const loadExistingMovies = async (): Promise<Set<string>> => {
+type ExistingMovie = {
+  id: number;
+  watchedDate: string | null;
+  letterboxdUrl: string | null;
+};
+
+const loadExistingMovies = async (): Promise<Map<string, ExistingMovie>> => {
   try {
     console.log("🔍 Loading existing movies from database...");
     const existing = await db
       .select({
+        id: movies.id,
         title: movies.title,
         releaseYear: movies.releaseYear,
+        watchedDate: movies.watchedDate,
+        letterboxdUrl: movies.letterboxdUrl,
       })
       .from(movies);
 
-    // Create a Set with "title|year" format for fast lookups
-    const movieKeys = new Set<string>(
-      existing.map(
-        (movie: { title: string; releaseYear: number | null }) =>
-          `${movie.title}|${movie.releaseYear}`
-      )
-    );
+    // Create a Map with "title|year" format for fast lookups
+    const movieMap = new Map<string, ExistingMovie>();
+    for (const movie of existing) {
+      const key = `${movie.title}|${movie.releaseYear ?? "null"}`;
+      movieMap.set(key, {
+        id: movie.id,
+        watchedDate: movie.watchedDate,
+        letterboxdUrl: movie.letterboxdUrl,
+      });
+    }
 
     console.log(`📚 Found ${existing.length} existing movies in database`);
-    return movieKeys;
+    return movieMap;
   } catch (err) {
     console.error("Error loading existing movies:", err);
-    return new Set();
+    return new Map();
   }
-};
-
-const checkIfMovieExists = (
-  title: string,
-  year: number,
-  existingMovies: Set<string>
-): boolean => {
-  return existingMovies.has(`${title}|${year}`);
 };
 
 const insertMovie = async (movie: MovieRecord): Promise<boolean> => {
@@ -76,6 +90,27 @@ const insertMovie = async (movie: MovieRecord): Promise<boolean> => {
     return true;
   } catch (err) {
     console.error(`Error inserting movie ${movie.title}:`, err);
+    return false;
+  }
+};
+
+const updateMovie = async (
+  movieId: number,
+  watchedDate: string | null,
+  letterboxdUrl: string | null
+): Promise<boolean> => {
+  try {
+    await db
+      .update(movies)
+      .set({
+        watchedDate,
+        letterboxdUrl,
+        updatedAt: new Date(),
+      })
+      .where(eq(movies.id, movieId));
+    return true;
+  } catch (err) {
+    console.error(`Error updating movie with ID ${movieId}:`, err);
     return false;
   }
 };
@@ -129,66 +164,91 @@ const importData = async (directory: string) => {
       process.exit(1);
     }
 
-    const allMovies: MovieRecord[] = [];
+    // Parse and merge CSV files
+    const mergedMoviesMap = new Map<string, MovieRecord>();
 
-    // Parse watched.csv
-    if (watchedExists) {
-      console.log("📖 Parsing watched.csv...");
-      const watchedMovies = parseCsvFile(watchedFile);
-      allMovies.push(...watchedMovies);
-      console.log(`✅ Found ${watchedMovies.length} watched movies`);
-    }
-
-    // Parse watchlist.csv
+    // First, load all watchlist movies (watchedDate = null)
     if (watchlistExists) {
       console.log("📖 Parsing watchlist.csv...");
       const watchlistMovies = parseCsvFile(watchlistFile);
-      // For watchlist movies, watchedDate should be null since they haven't been watched
-      const processedWatchlist = watchlistMovies.map((movie) => ({
-        ...movie,
-        watchedDate: null,
-      }));
-      allMovies.push(...processedWatchlist);
+      for (const movie of watchlistMovies) {
+        const key = `${movie.title}|${movie.releaseYear ?? "null"}`;
+        mergedMoviesMap.set(key, {
+          ...movie,
+          watchedDate: null,
+        });
+      }
       console.log(`✅ Found ${watchlistMovies.length} watchlist movies`);
     }
 
-    // Remove duplicates within the CSV data itself
-    const uniqueMovies = allMovies.filter(
-      (movie, index, arr) =>
-        arr.findIndex(
-          (m) => m.title === movie.title && m.releaseYear === movie.releaseYear
-        ) === index
-    );
+    // Then, add/update with watched movies (watchedDate from CSV)
+    if (watchedExists) {
+      console.log("📖 Parsing watched.csv...");
+      const watchedMovies = parseCsvFile(watchedFile);
+      for (const movie of watchedMovies) {
+        const key = `${movie.title}|${movie.releaseYear ?? "null"}`;
+        mergedMoviesMap.set(key, {
+          ...movie,
+          watchedDate: movie.watchedDate || null,
+        });
+      }
+      console.log(`✅ Found ${watchedMovies.length} watched movies`);
+    }
+
+    // Convert Map to array
+    const uniqueMovies = Array.from(mergedMoviesMap.values());
 
     console.log(`\n🎯 Processing ${uniqueMovies.length} unique movies...\n`);
 
     let inserted = 0;
+    let updated = 0;
     let skipped = 0;
 
     // Process each movie
     for (let i = 0; i < uniqueMovies.length; i++) {
       const movie = uniqueMovies[i];
+      const movieKey = `${movie.title}|${movie.releaseYear ?? "null"}`;
 
       const progressBar = createProgressBar(i + 1, uniqueMovies.length);
       updateProgressLine(
-        `${progressBar} - ${movie.title} (${movie.releaseYear})`
+        `${progressBar} - ${movie.title} (${movie.releaseYear ?? "N/A"})`
       );
 
-      // Check if movie already exists (fast in-memory lookup)
-      const exists = checkIfMovieExists(
-        movie.title,
-        movie.releaseYear ?? 0,
-        existingMovies
-      );
+      // Check if movie already exists
+      const existingMovie = existingMovies.get(movieKey);
 
-      if (exists) {
-        skipped++;
+      if (existingMovie) {
+        // Movie exists - check if update is needed
+        const watchedDateChanged =
+          existingMovie.watchedDate !== movie.watchedDate;
+        const letterboxdUrlChanged =
+          existingMovie.letterboxdUrl !== movie.letterboxdUrl;
+
+        if (watchedDateChanged || letterboxdUrlChanged) {
+          const success = await updateMovie(
+            existingMovie.id,
+            movie.watchedDate,
+            movie.letterboxdUrl
+          );
+          if (success) {
+            updated++;
+            // Update the in-memory map to reflect the change
+            existingMovies.set(movieKey, {
+              id: existingMovie.id,
+              watchedDate: movie.watchedDate,
+              letterboxdUrl: movie.letterboxdUrl,
+            });
+          } else {
+            skipped++;
+          }
+        } else {
+          skipped++;
+        }
       } else {
+        // Movie doesn't exist - insert it
         const success = await insertMovie(movie);
         if (success) {
           inserted++;
-          // Add to existing movies set to prevent duplicates within this import session
-          existingMovies.add(`${movie.title}|${movie.releaseYear}`);
         } else {
           skipped++;
         }
@@ -206,7 +266,8 @@ const importData = async (directory: string) => {
     console.log(`📊 Results:`);
     console.log(`   Total processed: ${uniqueMovies.length}`);
     console.log(`   🟢 Inserted: ${inserted}`);
-    console.log(`   🟡 Skipped (already exists): ${skipped}`);
+    console.log(`   🔵 Updated: ${updated}`);
+    console.log(`   🟡 Skipped (no changes): ${skipped}`);
   } catch (err) {
     console.error(
       "\n❌ Error:",

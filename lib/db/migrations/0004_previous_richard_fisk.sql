@@ -1,0 +1,1 @@
+CREATE INDEX "watched_date_idx" ON "movies" USING btree ("watched_date");

@@ -1,31 +1,20 @@
-import { isNotNull, isNull } from "drizzle-orm";
+import type { MovieCounts } from "@/lib/queries/movies";
 import Link from "next/link";
-import { db } from "@/lib/db";
-import { movies } from "@/lib/db/schema/movies";
 
 type QuickFilterLinksProps = {
   currentPath?: string;
+  counts: MovieCounts;
 };
 
-export async function QuickFilterLinks({
+export function QuickFilterLinks({
   currentPath = "/",
+  counts,
 }: QuickFilterLinksProps) {
-  // Get all counts
-  const [allMovies, watchedCount, watchlistCount] = await Promise.all([
-    db.select({ count: movies.id }).from(movies),
-    db
-      .select({ count: movies.id })
-      .from(movies)
-      .where(isNotNull(movies.watchedDate)),
-    db
-      .select({ count: movies.id })
-      .from(movies)
-      .where(isNull(movies.watchedDate)),
-  ]);
-
-  const totalMovies = allMovies.length;
-  const totalWatched = watchedCount.length;
-  const totalWatchlist = watchlistCount.length;
+  const {
+    total: totalMovies,
+    watched: totalWatched,
+    watchlist: totalWatchlist,
+  } = counts;
 
   const getLinkClassName = (path: string) => {
     const isActive = currentPath === path;

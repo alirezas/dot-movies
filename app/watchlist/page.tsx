@@ -1,45 +1,32 @@
-import { desc, isNull } from "drizzle-orm";
+import { Suspense } from "react";
+import {
+  getMovieCounts,
+  getWatchlistMoviesPaginated,
+} from "@/lib/queries/movies";
 import Link from "next/link";
-import { db } from "@/lib/db";
-import { movies } from "@/lib/db/schema/movies";
-import { MovieCard } from "../components/movie-card";
-import { QuickFilterLinks } from "../components/quick-filter-links";
+import { QuickFilterLinks } from "../../components/quick-filter-links";
+import { WatchlistMoviesList } from "../../components/watchlist-movies-list";
 
-export default async function WatchlistPage() {
-  const watchlistMovies = await db
-    .select()
-    .from(movies)
-    .where(isNull(movies.watchedDate))
-    .orderBy(desc(movies.createdAt));
+async function WatchlistCount() {
+  const counts = await getMovieCounts();
+  return (
+    <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+      {counts.watchlist} movies to watch
+    </p>
+  );
+}
+
+async function WatchlistMoviesContent() {
+  const [counts, initialMovies] = await Promise.all([
+    getMovieCounts(),
+    getWatchlistMoviesPaginated(0, 20),
+  ]);
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-            Watchlist
-          </h1>
-          <p className="mt-2 text-neutral-600 dark:text-neutral-400">
-            {watchlistMovies.length} movies to watch
-          </p>
-        </div>
-      </div>
-
-      {/* Quick filter links */}
-      <QuickFilterLinks currentPath="/watchlist" />
-
-      {watchlistMovies.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
-          {watchlistMovies.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={{
-                ...movie,
-                watchedDate: null,
-              }}
-            />
-          ))}
-        </div>
+    <>
+      <QuickFilterLinks currentPath="/watchlist" counts={counts} />
+      {initialMovies.length > 0 ? (
+        <WatchlistMoviesList initialMovies={initialMovies} />
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <h2 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
@@ -56,6 +43,41 @@ export default async function WatchlistPage() {
           </Link>
         </div>
       )}
+    </>
+  );
+}
+
+export default function WatchlistPage() {
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+            Watchlist
+          </h1>
+          <Suspense
+            fallback={
+              <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+                Loading...
+              </p>
+            }
+          >
+            <WatchlistCount />
+          </Suspense>
+        </div>
+      </div>
+
+      <Suspense
+        fallback={
+          <div className="flex justify-center py-16">
+            <div className="text-neutral-600 dark:text-neutral-400">
+              Loading movies...
+            </div>
+          </div>
+        }
+      >
+        <WatchlistMoviesContent />
+      </Suspense>
     </main>
   );
 }

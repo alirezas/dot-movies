@@ -8,9 +8,7 @@ type WatchedMoviesListProps = {
   initialMovies: Movie[];
 };
 
-export function WatchedMoviesList({
-  initialMovies,
-}: WatchedMoviesListProps) {
+export function WatchedMoviesList({ initialMovies }: WatchedMoviesListProps) {
   const [movies, setMovies] = useState(initialMovies);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialMovies.length >= 20);

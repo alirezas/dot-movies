@@ -21,7 +21,9 @@ export function MoviesList({ initialMovies }: MoviesListProps) {
     try {
       const offset = movies.length;
       const limit = 10;
-      const response = await fetch(`/api/movies?offset=${offset}&limit=${limit}`);
+      const response = await fetch(
+        `/api/movies?offset=${offset}&limit=${limit}`
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch movies");

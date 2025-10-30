@@ -26,6 +26,10 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## CLI Tools
+
+The project includes several CLI tools for data management. See [docs/README.md](docs/README.md) for detailed documentation on available tools.
+
 ## Commands
 
 - **Build**: `pnpm build`

@@ -1,7 +1,7 @@
-import { db } from "@/lib/db";
-import { movies } from "@/lib/db/schema/movies";
 import { desc, isNotNull } from "drizzle-orm";
 import Link from "next/link";
+import { db } from "@/lib/db";
+import { movies } from "@/lib/db/schema/movies";
 import { MovieCard } from "../components/movie-card";
 import { QuickFilterLinks } from "../components/quick-filter-links";
 

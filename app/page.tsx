@@ -1,14 +1,17 @@
-import { db } from "@/lib/db";
-import { movies } from "@/lib/db/schema/movies";
 import { desc, isNotNull, isNull } from "drizzle-orm";
 import Link from "next/link";
+import { db } from "@/lib/db";
+import { movies } from "@/lib/db/schema/movies";
 import { MovieCard } from "./components/movie-card";
 import { QuickFilterLinks } from "./components/quick-filter-links";
 
 export default async function MoviesPage() {
   // Get all movies and separate counts
   const [allMovies, watchedCount, watchlistCount] = await Promise.all([
-    db.select().from(movies).orderBy(desc(movies.releaseYear)), // Show newest added first
+    db
+      .select()
+      .from(movies)
+      .orderBy(desc(movies.releaseYear)), // Show newest added first
     db
       .select({ count: movies.id })
       .from(movies)

@@ -1,4 +1,3 @@
-import type { MovieExtendedRecord } from "@/lib/tvdb/generated";
 import {
   date,
   integer,
@@ -8,6 +7,7 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+import type { MovieExtendedRecord } from "@/lib/tvdb/generated";
 
 export const movies = pgTable("movies", {
   id: serial("id").primaryKey(),

@@ -1,7 +1,7 @@
-import { db } from "@/lib/db";
-import { movies } from "@/lib/db/schema/movies";
 import { isNotNull, isNull } from "drizzle-orm";
 import Link from "next/link";
+import { db } from "@/lib/db";
+import { movies } from "@/lib/db/schema/movies";
 
 type QuickFilterLinksProps = {
   currentPath?: string;

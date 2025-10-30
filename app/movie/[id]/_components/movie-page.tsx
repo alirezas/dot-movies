@@ -1,9 +1,9 @@
 "use client";
 
-import type { Movie } from "@/lib/db/schema";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import type { Movie } from "@/lib/db/schema";
+import { cn } from "@/lib/utils";
 
 type Props = {
   movie: Movie;

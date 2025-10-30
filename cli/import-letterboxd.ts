@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import { Command } from "commander";
-import { parse } from "csv-parse/sync";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { Command } from "commander";
+import { parse } from "csv-parse/sync";
 import { db } from "../lib/db/index";
 import { type Movie, movies } from "../lib/db/schema/movies";
 

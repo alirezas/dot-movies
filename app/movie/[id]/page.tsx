@@ -1,7 +1,7 @@
+import { eq } from "drizzle-orm";
 import MoviePage from "@/app/movie/[id]/_components/movie-page";
 import { db } from "@/lib/db";
 import { movies } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
 
 type PageProps = {
   params: Promise<{ id: string }>;

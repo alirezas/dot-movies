@@ -6,7 +6,7 @@
 - **Lint**: `npm run lint` or `pnpm lint`
 - **Lint fix**: `npm run lint:fix` or `pnpm lint:fix`
 - **Format**: `npm run format` or `pnpm format`
-- **Type check**: `npm run check` or `pnpm check`
+- **Type check**: `npm run check` or `pnpm check` (TypeScript)
 
 ## Code Style
 - **TypeScript**: Strict mode enabled, target ES2017

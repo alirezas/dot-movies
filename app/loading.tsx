@@ -1,3 +1,5 @@
+import { MovieCardSkeletonGrid } from "@/components/movie-card-skeleton";
+
 export default function Loading() {
   return (
     <main className="container mx-auto px-4 py-8">
@@ -11,11 +13,7 @@ export default function Loading() {
           </div>
         </div>
       </div>
-      <div className="flex justify-center py-16">
-        <div className="text-neutral-600 dark:text-neutral-400">
-          Loading movies...
-        </div>
-      </div>
+      <MovieCardSkeletonGrid count={24} />
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import { MovieCardSkeletonGrid } from "@/components/movie-card-skeleton";
 import { Suspense } from "react";
 import {
   getMovieCounts,
@@ -5,7 +6,6 @@ import {
 } from "@/lib/queries/movies";
 import { toMovieCardData } from "@/lib/types";
 import Link from "next/link";
-import { QuickFilterLinks } from "../../components/quick-filter-links";
 import { InfiniteMovieList } from "../../components/infinite-movie-list";
 
 async function WatchlistCount() {
@@ -17,17 +17,19 @@ async function WatchlistCount() {
   );
 }
 
+const INITIAL_LIMIT = 24;
+
 async function WatchlistMoviesContent() {
-  const [counts, initialMovies] = await Promise.all([
-    getMovieCounts(),
-    getWatchlistMoviesPaginated(0, 20),
-  ]);
+  const initialMovies = await getWatchlistMoviesPaginated(0, INITIAL_LIMIT);
 
   return (
     <>
-      <QuickFilterLinks currentPath="/watchlist" counts={counts} />
       {initialMovies.length > 0 ? (
-        <InfiniteMovieList initialMovies={initialMovies.map(toMovieCardData)} fetchParams="watchlist=true" />
+        <InfiniteMovieList
+          initialMovies={initialMovies.map(toMovieCardData)}
+          initialHasMore={initialMovies.length >= INITIAL_LIMIT}
+          fetchParams="watchlist=true"
+        />
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <h2 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
@@ -50,7 +52,7 @@ async function WatchlistMoviesContent() {
 
 export default function WatchlistPage() {
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="px-6 py-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
@@ -68,15 +70,7 @@ export default function WatchlistPage() {
         </div>
       </div>
 
-      <Suspense
-        fallback={
-          <div className="flex justify-center py-16">
-            <div className="text-neutral-600 dark:text-neutral-400">
-              Loading movies...
-            </div>
-          </div>
-        }
-      >
+      <Suspense fallback={<MovieCardSkeletonGrid count={24} />}>
         <WatchlistMoviesContent />
       </Suspense>
     </main>

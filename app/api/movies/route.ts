@@ -9,7 +9,7 @@ import { type NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const offset = Math.max(0, parseInt(searchParams.get("offset") || "0", 10));
-  const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "10", 10)));
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "10", 10)));
   const watched = searchParams.get("watched") === "true";
   const watchlist = searchParams.get("watchlist") === "true";
 

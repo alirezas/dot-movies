@@ -25,7 +25,7 @@ export function DevRefreshButton({ movieId }: { movieId: number }) {
 
   return (
     <button
-      className="size-6 rounded grid place-items-center bg-blue-500/20"
+      className="size-6 rounded grid place-items-center backdrop-blur-md backdrop-brightness-25"
       type="button"
       onClick={handleRefresh}
     >

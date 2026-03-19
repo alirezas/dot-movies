@@ -10,6 +10,8 @@ A Next.js application for tracking and managing your movie watchlist and watched
 - **Styling**: Tailwind CSS 4 with dark mode
 - **API**: TVDB v4 (auto-generated OpenAPI client)
 - **Linting/Formatting**: Biome
+- **CI/CD**: GitHub Actions + Vercel
+- **Git Hooks**: Husky (pre-push validation)
 
 ## Features
 
@@ -73,3 +75,10 @@ See [docs/README.md](docs/README.md) for detailed documentation.
 | `pnpm db:push` | Push schema to database |
 | `pnpm db:studio` | Open Drizzle Studio |
 | `pnpm generate:tvdb` | Regenerate TVDB API client |
+
+## Development Workflow
+
+- **`main`** is protected — direct pushes are blocked
+- Create a feature branch (e.g. `dev`), push changes, and open a PR to `main`
+- PRs must pass the **Lint, Type Check & Build** CI check before merging
+- Husky runs `pnpm lint && pnpm check && pnpm build` locally on every `git push`

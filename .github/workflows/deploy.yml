@@ -11,9 +11,12 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-typecheck:
-    name: Lint & Type Check
+  validate:
+    name: Lint, Type Check & Build
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      TVDB_API_KEY: ${{ secrets.TVDB_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -29,10 +32,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm check
+      - run: pnpm build
 
   deploy-preview:
     name: Deploy Preview
-    needs: lint-and-typecheck
+    needs: validate
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment:
@@ -62,7 +66,7 @@ jobs:
 
   deploy-production:
     name: Deploy Production
-    needs: lint-and-typecheck
+    needs: validate
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:

@@ -3,7 +3,7 @@ import {
   getWatchedMoviesPaginated,
   getWatchlistMoviesPaginated,
 } from "@/lib/queries/movies";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -13,14 +13,11 @@ export async function GET(request: NextRequest) {
   const watchlist = searchParams.get("watchlist") === "true";
 
   try {
-    let movies;
-    if (watched) {
-      movies = await getWatchedMoviesPaginated(offset, limit);
-    } else if (watchlist) {
-      movies = await getWatchlistMoviesPaginated(offset, limit);
-    } else {
-      movies = await getMoviesPaginated(offset, limit);
-    }
+    const movies = watched
+      ? await getWatchedMoviesPaginated(offset, limit)
+      : watchlist
+        ? await getWatchlistMoviesPaginated(offset, limit)
+        : await getMoviesPaginated(offset, limit);
 
     return NextResponse.json(movies);
   } catch (error) {

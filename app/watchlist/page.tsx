@@ -3,6 +3,7 @@ import {
   getMovieCounts,
   getWatchlistMoviesPaginated,
 } from "@/lib/queries/movies";
+import { toMovieCardData } from "@/lib/types";
 import Link from "next/link";
 import { QuickFilterLinks } from "../../components/quick-filter-links";
 import { InfiniteMovieList } from "../../components/infinite-movie-list";
@@ -26,7 +27,7 @@ async function WatchlistMoviesContent() {
     <>
       <QuickFilterLinks currentPath="/watchlist" counts={counts} />
       {initialMovies.length > 0 ? (
-        <InfiniteMovieList initialMovies={initialMovies} fetchParams="watchlist=true" />
+        <InfiniteMovieList initialMovies={initialMovies.map(toMovieCardData)} fetchParams="watchlist=true" />
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <h2 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300 mb-2">

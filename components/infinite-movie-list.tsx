@@ -1,11 +1,11 @@
 "use client";
 
 import { MovieCard } from "@/components/movie-card";
-import type { Movie } from "@/lib/db/schema/movies";
+import type { MovieCardData } from "@/lib/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type InfiniteMovieListProps = {
-  initialMovies: Movie[];
+  initialMovies: MovieCardData[];
   fetchParams?: string;
 };
 
@@ -34,7 +34,7 @@ export function InfiniteMovieList({
         throw new Error("Failed to fetch movies");
       }
 
-      const newMovies: Movie[] = await response.json();
+      const newMovies: MovieCardData[] = await response.json();
 
       if (newMovies.length === 0) {
         setHasMore(false);

@@ -1,4 +1,5 @@
 import { getMovieCounts, getMoviesPaginated } from "@/lib/queries/movies";
+import { toMovieCardData } from "@/lib/types";
 import Link from "next/link";
 import { Suspense } from "react";
 import { InfiniteMovieList } from "../components/infinite-movie-list";
@@ -27,7 +28,7 @@ async function MoviesContent() {
     <>
       <QuickFilterLinks currentPath="/" counts={counts} />
       {initialMovies.length > 0 ? (
-        <InfiniteMovieList initialMovies={initialMovies} />
+        <InfiniteMovieList initialMovies={initialMovies.map(toMovieCardData)} />
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <h2 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300 mb-2">

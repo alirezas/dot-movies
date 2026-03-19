@@ -17,7 +17,8 @@
     "letterboxd:import": "tsx cli/import-letterboxd.ts",
     "movies:update-tvdb": "tsx cli/update-watched-movies.ts",
     "watchlist:update-tvdb": "tsx cli/update-watchlist-movies.ts",
-    "generate:tvdb": "openapi-ts"
+    "generate:tvdb": "openapi-ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hey-api/openapi-ts": "^0.94.3",
@@ -49,6 +50,7 @@
     "autoprefixer": "^10.4.27",
     "dotenv": "^17.3.1",
     "drizzle-kit": "0.31.10",
+    "husky": "^9.1.7",
     "pg": "^8.20.0",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",

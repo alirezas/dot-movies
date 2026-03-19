@@ -90,6 +90,9 @@ importers:
       drizzle-kit:
         specifier: 0.31.10
         version: 0.31.10
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
       pg:
         specifier: ^8.20.0
         version: 8.20.0
@@ -1365,6 +1368,11 @@ packages:
 
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+
+  husky@9.1.7:
+    resolution: {integrity: sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   is-docker@3.0.0:
     resolution: {integrity: sha512-eljcgEDlEns/7AXFosB5K/2nCM4P7FQPkGc/DWLy5rmFEWvZayGrik1d9/QIY5nJ4f9YsVvBkA6kJpHn9rISdQ==}
@@ -2732,6 +2740,8 @@ snapshots:
       pathe: 2.0.3
 
   graceful-fs@4.2.11: {}
+
+  husky@9.1.7: {}
 
   is-docker@3.0.0: {}
 

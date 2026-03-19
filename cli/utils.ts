@@ -1,3 +1,8 @@
+import * as dotenv from "dotenv";
+
+// Load .env for CLI scripts (Next.js handles this automatically for the web app)
+dotenv.config();
+
 export const createProgressBar = (
   current: number,
   total: number,

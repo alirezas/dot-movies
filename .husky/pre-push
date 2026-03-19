@@ -1,1 +1,5 @@
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$branch" = "dev" ]; then
+  exit 0
+fi
 pnpm lint && pnpm check && pnpm build

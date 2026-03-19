@@ -1,8 +1,9 @@
+import { MovieCardSkeletonGrid } from "@/components/movie-card-skeleton";
 import { getMovieCounts, getMoviesPaginated } from "@/lib/queries/movies";
+import { toMovieCardData } from "@/lib/types";
 import Link from "next/link";
 import { Suspense } from "react";
 import { InfiniteMovieList } from "../components/infinite-movie-list";
-import { QuickFilterLinks } from "../components/quick-filter-links";
 
 async function MovieCounts() {
   const counts = await getMovieCounts();
@@ -17,17 +18,18 @@ async function MovieCounts() {
   );
 }
 
+const INITIAL_LIMIT = 24;
+
 async function MoviesContent() {
-  const [counts, initialMovies] = await Promise.all([
-    getMovieCounts(),
-    getMoviesPaginated(0, 20),
-  ]);
+  const initialMovies = await getMoviesPaginated(0, INITIAL_LIMIT);
 
   return (
     <>
-      <QuickFilterLinks currentPath="/" counts={counts} />
       {initialMovies.length > 0 ? (
-        <InfiniteMovieList initialMovies={initialMovies} />
+        <InfiniteMovieList
+          initialMovies={initialMovies.map(toMovieCardData)}
+          initialHasMore={initialMovies.length >= INITIAL_LIMIT}
+        />
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <h2 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
@@ -50,7 +52,7 @@ async function MoviesContent() {
 
 export default function MoviesPage() {
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="px-6 py-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
@@ -68,15 +70,7 @@ export default function MoviesPage() {
         </div>
       </div>
 
-      <Suspense
-        fallback={
-          <div className="flex justify-center py-16">
-            <div className="text-neutral-600 dark:text-neutral-400">
-              Loading movies...
-            </div>
-          </div>
-        }
-      >
+      <Suspense fallback={<MovieCardSkeletonGrid count={24} />}>
         <MoviesContent />
       </Suspense>
     </main>

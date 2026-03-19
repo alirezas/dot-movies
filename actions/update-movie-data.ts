@@ -5,7 +5,18 @@ import { db } from "@/lib/db";
 import { type Movie, movies } from "@/lib/db/schema";
 import { getMovieExtended, getSearchResults } from "@/lib/tvdb/generated";
 
-export const updateMovieData = async (movie: Movie) => {
+export const updateMovieData = async (movieOrId: Movie | number) => {
+  const movie =
+    typeof movieOrId === "number"
+      ? await db.query.movies.findFirst({
+          where: eq(movies.id, movieOrId),
+        })
+      : movieOrId;
+
+  if (!movie) {
+    throw new Error("Movie not found");
+  }
+
   const searchQuery = await getSearchResults({
     query: {
       query: movie.title,

@@ -3,8 +3,16 @@
 import type { MovieCardData } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { EyeIcon } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
+
+const DevRefreshButton =
+  process.env.NODE_ENV === "development"
+    ? dynamic(() =>
+        import("./dev-refresh-button").then((m) => m.DevRefreshButton)
+      )
+    : null;
 
 interface MovieCardProps {
   movie: MovieCardData;
@@ -26,6 +34,7 @@ export function MovieCard({ movie }: MovieCardProps) {
             <EyeIcon className="size-4 text-amber-500" />
           </div>
         )}
+        {DevRefreshButton && <DevRefreshButton movieId={movie.id} />}
       </div>
       <Link href={`/movie/${movie.id}`}>
         <Image

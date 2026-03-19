@@ -21,7 +21,7 @@ export function MovieCard({ movie }: MovieCardProps) {
   const handleGetTVDBData = async () => {
     try {
       setIsLoading(true);
-      await updateMovieData(movie, movie.id);
+      await updateMovieData(movie);
       toast.success("TVDB data updated");
       router.refresh();
     } catch {
@@ -66,6 +66,7 @@ export function MovieCard({ movie }: MovieCardProps) {
           src={movie.tvdbData?.image || "/placeholder.svg"}
           alt={movie.title}
           fill
+          sizes="200px"
           className="object-cover z-0"
         />
 

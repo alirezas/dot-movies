@@ -7,6 +7,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { db } from "../lib/db/index";
 import { movies } from "../lib/db/schema/movies";
+import { createProgressBar, updateProgressLine } from "./utils";
 
 type MovieRecord = {
   title: string;
@@ -115,26 +116,6 @@ const updateMovie = async (
   }
 };
 
-const createProgressBar = (
-  current: number,
-  total: number,
-  width: number = 40
-): string => {
-  const percentage = Math.round((current / total) * 100);
-  const filledWidth = Math.round((current / total) * width);
-  const emptyWidth = width - filledWidth;
-
-  const filledBar = "█".repeat(filledWidth);
-  const emptyBar = "░".repeat(emptyWidth);
-
-  return `[${filledBar}${emptyBar}] ${percentage}% (${current}/${total})`;
-};
-
-const updateProgressLine = (message: string) => {
-  process.stdout.clearLine(0);
-  process.stdout.cursorTo(0);
-  process.stdout.write(message);
-};
 
 const importData = async (directory: string) => {
   try {
@@ -287,8 +268,8 @@ program
     "<directory>",
     "Path to directory containing watched.csv and/or watchlist.csv"
   )
-  .action((directory: string) => {
-    importData(directory);
+  .action(async (directory: string) => {
+    await importData(directory);
   });
 
 program.parse(process.argv);

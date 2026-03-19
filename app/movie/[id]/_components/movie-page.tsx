@@ -2,15 +2,16 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import type { Movie } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  movie: Movie;
+  title: string;
+  releaseYear: number | null;
+  poster: string | null;
+  artworks: string[];
 };
 
-const MoviePage = ({ movie }: Props) => {
-  const artworks = movie.tvdbData?.artworks || [];
+const MoviePage = ({ title, releaseYear, poster, artworks }: Props) => {
   const [currentArtworkIndex, setCurrentArtworkIndex] = useState(0);
 
   useEffect(() => {
@@ -23,16 +24,16 @@ const MoviePage = ({ movie }: Props) => {
     return () => clearInterval(interval);
   }, [artworks.length]);
 
-  const currentArtwork = artworks[currentArtworkIndex]?.image || "";
+  const currentArtwork = artworks[currentArtworkIndex] || "";
 
   return (
     <>
       <div
         className="bg-cover bg-center bg-no-repeat w-full h-screen fixed inset-0 z-0 blur-xl opacity-10"
         style={{
-          backgroundImage: `url(${movie.tvdbData?.artworks?.[0]?.image})`,
+          backgroundImage: poster ? `url(${poster})` : undefined,
         }}
-      ></div>
+      />
       <div className="container relative z-10 max-w-screen-lg mx-auto px-4 py-8">
         <div
           className={cn(
@@ -46,14 +47,16 @@ const MoviePage = ({ movie }: Props) => {
         >
           <Image
             src={currentArtwork || "/placeholder.svg"}
-            alt={movie.title}
+            alt={title}
             fill
+            sizes="(max-width: 1024px) 100vw, 1024px"
+            priority
             className="object-cover z-0"
           />
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/60 to-background/0 p-8 pt-16 text-sm z-10 text-shadow-xs">
-            <h2 className="font-bold text-6xl truncate">{movie.title}</h2>
+            <h2 className="font-bold text-6xl truncate">{title}</h2>
             <span className="opacity-80 font-semibold text-xl">
-              ({movie.releaseYear})
+              ({releaseYear})
             </span>
           </div>
         </div>

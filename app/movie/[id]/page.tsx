@@ -1,14 +1,14 @@
 import { eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
 import MoviePage from "@/app/movie/[id]/_components/movie-page";
 import { db } from "@/lib/db";
 import { movies } from "@/lib/db/schema";
 
 type PageProps = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-const Page = async ({ params }: PageProps) => {
+export default async function Page({ params }: PageProps) {
   const { id } = await params;
 
   const movie = await db.query.movies.findFirst({
@@ -16,10 +16,17 @@ const Page = async ({ params }: PageProps) => {
   });
 
   if (!movie) {
-    return <div>Movie not found</div>;
+    notFound();
   }
 
-  return <MoviePage movie={movie} />;
-};
+  const artworks = movie.tvdbData?.artworks?.map((a) => a.image).filter(Boolean) as string[] ?? [];
 
-export default Page;
+  return (
+    <MoviePage
+      title={movie.title}
+      releaseYear={movie.releaseYear}
+      poster={movie.tvdbData?.artworks?.[0]?.image ?? null}
+      artworks={artworks}
+    />
+  );
+}

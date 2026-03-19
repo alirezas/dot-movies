@@ -3,7 +3,11 @@ import type { CreateClientConfig } from "./generated/client.gen";
 
 const BASE_URL = "https://api4.thetvdb.com/v4";
 
+let cachedToken: string | null = null;
+
 const getToken = async (): Promise<string | null> => {
+  if (cachedToken) return cachedToken;
+
   const response = await fetch(`${BASE_URL}/login`, {
     method: "POST",
     headers: {
@@ -11,12 +15,13 @@ const getToken = async (): Promise<string | null> => {
       Accept: "application/json",
     },
     body: JSON.stringify({
-      apikey: env.NEXT_PUBLIC_TVDB_API_KEY,
+      apikey: env.TVDB_API_KEY,
       pin: "123456",
     }),
   });
   const data = await response.json();
-  return data.data?.token ?? null;
+  cachedToken = data.data?.token ?? null;
+  return cachedToken;
 };
 
 export const createClientConfig: CreateClientConfig = (config) => ({

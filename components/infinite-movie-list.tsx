@@ -4,11 +4,15 @@ import { MovieCard } from "@/components/movie-card";
 import type { Movie } from "@/lib/db/schema/movies";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type MoviesListProps = {
+type InfiniteMovieListProps = {
   initialMovies: Movie[];
+  fetchParams?: string;
 };
 
-export function MoviesList({ initialMovies }: MoviesListProps) {
+export function InfiniteMovieList({
+  initialMovies,
+  fetchParams = "",
+}: InfiniteMovieListProps) {
   const [movies, setMovies] = useState(initialMovies);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialMovies.length >= 20);
@@ -21,9 +25,10 @@ export function MoviesList({ initialMovies }: MoviesListProps) {
     try {
       const offset = movies.length;
       const limit = 10;
-      const response = await fetch(
-        `/api/movies?offset=${offset}&limit=${limit}`
-      );
+      const params = new URLSearchParams(fetchParams);
+      params.set("offset", String(offset));
+      params.set("limit", String(limit));
+      const response = await fetch(`/api/movies?${params.toString()}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch movies");
@@ -41,7 +46,6 @@ export function MoviesList({ initialMovies }: MoviesListProps) {
           );
           return [...prev, ...uniqueNewMovies];
         });
-        // If we got fewer than requested, we've reached the end
         if (newMovies.length < limit) {
           setHasMore(false);
         }
@@ -52,7 +56,7 @@ export function MoviesList({ initialMovies }: MoviesListProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, hasMore, movies.length]);
+  }, [isLoading, hasMore, movies.length, fetchParams]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -84,15 +88,7 @@ export function MoviesList({ initialMovies }: MoviesListProps) {
     <>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
         {movies.map((movie) => (
-          <MovieCard
-            key={movie.id}
-            movie={{
-              ...movie,
-              watchedDate: movie.watchedDate
-                ? new Date(movie.watchedDate).toISOString()
-                : null,
-            }}
-          />
+          <MovieCard key={movie.id} movie={movie} />
         ))}
       </div>
       {hasMore && (

@@ -5,7 +5,7 @@ import {
 import Link from "next/link";
 import { Suspense } from "react";
 import { QuickFilterLinks } from "../../components/quick-filter-links";
-import { WatchedMoviesList } from "../../components/watched-movies-list";
+import { InfiniteMovieList } from "../../components/infinite-movie-list";
 
 async function WatchedCount() {
   const counts = await getMovieCounts();
@@ -26,7 +26,7 @@ async function WatchedMoviesContent() {
     <>
       <QuickFilterLinks currentPath="/watched" counts={counts} />
       {initialMovies.length > 0 ? (
-        <WatchedMoviesList initialMovies={initialMovies} />
+        <InfiniteMovieList initialMovies={initialMovies} fetchParams="watched=true" />
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <h2 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300 mb-2">

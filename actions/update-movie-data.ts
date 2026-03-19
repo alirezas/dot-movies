@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { type Movie, movies } from "@/lib/db/schema";
 import { getMovieExtended, getSearchResults } from "@/lib/tvdb/generated";
 
-export const updateMovieData = async (movie: Movie, movieId: number) => {
+export const updateMovieData = async (movie: Movie) => {
   const searchQuery = await getSearchResults({
     query: {
       query: movie.title,
@@ -21,7 +21,6 @@ export const updateMovieData = async (movie: Movie, movieId: number) => {
     throw new Error("No movie found");
   }
 
-  // Year must match (within 1 year tolerance for edge cases)
   const searchYear = Number(searchResult.year);
   const movieYear = movie.releaseYear;
   const yearMatches =
@@ -30,8 +29,6 @@ export const updateMovieData = async (movie: Movie, movieId: number) => {
     searchYear === movieYear ||
     Math.abs(searchYear - movieYear) <= 1;
 
-  // If year matches, trust the API result (titles can be in different languages/scripts)
-  // The API might return the original language title (e.g., Persian, Arabic) which is fine
   if (!yearMatches) {
     throw new Error(
       `${movie.title} (${movie.releaseYear})` +
@@ -58,8 +55,9 @@ export const updateMovieData = async (movie: Movie, movieId: number) => {
     .update(movies)
     .set({
       tvdbData: extendedMovieData,
+      updatedAt: new Date(),
     })
-    .where(eq(movies.id, movieId))
+    .where(eq(movies.id, movie.id))
     .returning();
 
   return updatedMovie[0];

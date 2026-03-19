@@ -5,7 +5,7 @@ import {
 } from "@/lib/queries/movies";
 import Link from "next/link";
 import { QuickFilterLinks } from "../../components/quick-filter-links";
-import { WatchlistMoviesList } from "../../components/watchlist-movies-list";
+import { InfiniteMovieList } from "../../components/infinite-movie-list";
 
 async function WatchlistCount() {
   const counts = await getMovieCounts();
@@ -26,7 +26,7 @@ async function WatchlistMoviesContent() {
     <>
       <QuickFilterLinks currentPath="/watchlist" counts={counts} />
       {initialMovies.length > 0 ? (
-        <WatchlistMoviesList initialMovies={initialMovies} />
+        <InfiniteMovieList initialMovies={initialMovies} fetchParams="watchlist=true" />
       ) : (
         <div className="flex flex-col items-center justify-center py-16">
           <h2 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300 mb-2">

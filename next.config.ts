@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  typescript: { ignoreBuildErrors: true },
   cacheComponents: true,
   turbopack: {
     root: __dirname,
@@ -10,7 +9,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*",
+        hostname: "artworks.thetvdb.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.thetvdb.com",
       },
     ],
   },

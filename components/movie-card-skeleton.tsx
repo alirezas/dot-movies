@@ -13,6 +13,7 @@ export function MovieCardSkeletonGrid({ count = 10 }: { count?: number }) {
   return (
     <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
       {Array.from({ length: count }, (_, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: static placeholders with no state
         <MovieCardSkeleton key={i} />
       ))}
     </div>

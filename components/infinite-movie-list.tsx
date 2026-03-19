@@ -155,6 +155,7 @@ export function InfiniteMovieList({
         ))}
         {hasMore && isLoading &&
           Array.from({ length: skeletonCount }, (_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: static placeholders with no state
             <MovieCardSkeleton key={`skeleton-${i}`} />
           ))}
       </div>

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import "./utils"; // Load .env before anything else
 import { Command } from "commander";
 import { parse } from "csv-parse/sync";
 import { eq } from "drizzle-orm";

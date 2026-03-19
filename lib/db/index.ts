@@ -1,11 +1,9 @@
 import { neon } from "@neondatabase/serverless";
-import * as dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 
-// Load environment variables from .env file
-dotenv.config();
-
+// Next.js and Vercel handle .env loading automatically.
+// CLI scripts load env via dotenv in their own entry points.
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is not set");

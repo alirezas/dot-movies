@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import "./utils"; // Load .env before anything else
 import { Command } from "commander";
 import { and, isNull } from "drizzle-orm";
 import { updateMovieData } from "../actions/update-movie-data";

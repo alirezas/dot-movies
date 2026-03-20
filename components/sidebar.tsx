@@ -53,11 +53,12 @@ export function Sidebar() {
         })}
       </nav>
 
-      {ImportDialogTrigger && (
-        <div className="border-t border-sidebar-border p-3">
-          <ImportDialogTrigger />
-        </div>
-      )}
+      <div className="border-t border-sidebar-border p-3">
+        {ImportDialogTrigger && <ImportDialogTrigger />}
+        <p className="mt-2 text-xs text-sidebar-foreground/40">
+          v{process.env.APP_VERSION}
+        </p>
+      </div>
     </aside>
   );
 }

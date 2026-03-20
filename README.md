@@ -75,6 +75,7 @@ See [docs/README.md](docs/README.md) for detailed documentation.
 | `pnpm db:push` | Push schema to database |
 | `pnpm db:studio` | Open Drizzle Studio |
 | `pnpm generate:tvdb` | Regenerate TVDB API client |
+| `pnpm release` | Bump version, update changelog, commit & tag |
 
 ## Development Workflow
 
@@ -82,3 +83,22 @@ See [docs/README.md](docs/README.md) for detailed documentation.
 - Create a feature branch (e.g. `dev`), push changes, and open a PR to `main`
 - PRs must pass the **Lint, Type Check & Build** CI check before merging
 - Husky runs `pnpm lint && pnpm check && pnpm build` locally on every `git push`
+
+## Releasing
+
+This project uses [changelogen](https://github.com/unjs/changelogen) for versioning and changelog generation. Write commits using [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+```bash
+git commit -m "feat: add watchlist filtering"
+git commit -m "fix: movie poster not loading"
+git commit -m "refactor: simplify sidebar layout"
+```
+
+When ready to release:
+
+```bash
+pnpm release          # bumps version, updates CHANGELOG.md, commits & tags
+git push --follow-tags # push commit and tag to remote
+```
+
+The app version is displayed in the sidebar and is read from `package.json` at build time.

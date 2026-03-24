@@ -104,8 +104,11 @@ export async function processImport(
 
   for (let i = 0; i < movieRecords.length; i++) {
     const movie = movieRecords[i];
+    const year = movie.releaseYear ?? "N/A";
     const movieKey = `${movie.title}|${movie.releaseYear ?? "null"}`;
     const existing = existingMovies.get(movieKey);
+
+    await logger.info(`Loading ${movie.title} (${year})`);
 
     try {
       if (existing) {
@@ -113,6 +116,18 @@ export async function processImport(
         const letterboxdUrlChanged = existing.letterboxdUrl !== movie.letterboxdUrl;
 
         if (watchedDateChanged || letterboxdUrlChanged) {
+          const changes: string[] = [];
+          if (watchedDateChanged) {
+            if (!existing.watchedDate && movie.watchedDate) {
+              changes.push("moved from watchlist to watched");
+            } else if (existing.watchedDate && !movie.watchedDate) {
+              changes.push("moved from watched to watchlist");
+            } else {
+              changes.push(`watched date ${existing.watchedDate} → ${movie.watchedDate}`);
+            }
+          }
+          if (letterboxdUrlChanged) changes.push("letterboxd URL");
+
           await db
             .update(movies)
             .set({
@@ -129,11 +144,12 @@ export async function processImport(
           });
 
           updated++;
-          await logger.info(
-            `Updated: ${movie.title} (${movie.releaseYear ?? "N/A"})`
+          await logger.warn(
+            `Updated ${movie.title} (${year}) — ${changes.join(", ")}`
           );
         } else {
           skipped++;
+          await logger.info(`Skipped ${movie.title} (${year})`);
         }
       } else {
         await db.insert(movies).values({
@@ -144,14 +160,12 @@ export async function processImport(
         });
 
         inserted++;
-        await logger.info(
-          `Inserted: ${movie.title} (${movie.releaseYear ?? "N/A"})`
-        );
+        await logger.info(`Added ${movie.title} (${year})`);
       }
     } catch (err) {
       errors++;
       await logger.error(
-        `Failed: ${movie.title} (${movie.releaseYear ?? "N/A"}) - ${err instanceof Error ? err.message : "Unknown error"}`
+        `Failed ${movie.title} (${year}) — ${err instanceof Error ? err.message : "Unknown error"}`
       );
     }
 

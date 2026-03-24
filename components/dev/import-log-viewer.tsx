@@ -272,7 +272,7 @@ export function ImportLogViewer({ initialLog, initialEntries, slug }: Props) {
             if (!parsed) {
               return (
                 <div
-                  key={`${entry.id}-${i}`}
+                  key={`${entry.id}-${entry.message}`}
                   className={`flex items-center gap-3 px-4 py-2.5 ${borderClass}`}
                 >
                   <Info className="size-4 shrink-0 text-neutral-400 dark:text-neutral-500" />
@@ -285,7 +285,7 @@ export function ImportLogViewer({ initialLog, initialEntries, slug }: Props) {
 
             return (
               <div
-                key={`${entry.id}-${i}`}
+                key={`${entry.id}-${entry.message}`}
                 className={`flex items-center gap-3 px-4 py-3 ${borderClass}`}
               >
                 {config.icon}

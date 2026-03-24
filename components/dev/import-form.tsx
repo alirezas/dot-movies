@@ -78,6 +78,7 @@ export function ImportForm() {
           Go to Letterboxd Data Export
         </a>
       </div>
+      {/* biome-ignore lint/a11y/useSemanticElements: dropzone needs drag events on a div */}
       <div
         role="button"
         tabIndex={0}

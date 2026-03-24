@@ -1,18 +1,8 @@
 "use client";
 
-import { BookmarkCheck, Eye, Film } from "lucide-react";
-import dynamic from "next/dynamic";
+import { BookmarkCheck, Eye, Film, Upload } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-const ImportDialogTrigger =
-  process.env.NODE_ENV === "development"
-    ? dynamic(() =>
-        import("./dev/import-dialog-trigger").then(
-          (m) => m.ImportDialogTrigger
-        )
-      )
-    : null;
 
 const navItems = [
   { href: "/", label: "All Movies", icon: Film },
@@ -29,6 +19,9 @@ export function Sidebar() {
         <Link href="/" className="text font-light uppercase">
           Dot Movies
         </Link>
+        <p className="mt-1 text-xs text-sidebar-foreground/40">
+          v{process.env.APP_VERSION}
+        </p>
       </div>
 
       <nav className="flex-1 space-y-1 px-3">
@@ -53,9 +46,15 @@ export function Sidebar() {
         })}
       </nav>
 
-      {ImportDialogTrigger && (
+      {process.env.NODE_ENV === "development" && (
         <div className="border-t border-sidebar-border p-3">
-          <ImportDialogTrigger />
+          <Link
+            href="/dev/import"
+            className="flex items-center gap-1.5 rounded-md bg-neutral-100 px-2.5 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+          >
+            <Upload className="size-3.5" />
+            Import
+          </Link>
         </div>
       )}
     </aside>

@@ -7,7 +7,7 @@ export default function DevLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="px-6 py-8">
+    <div className="px-6 py-8 flex flex-col gap-6">
       <div className="mb-6 flex items-center gap-4">
         <Link
           href="/"
@@ -19,7 +19,9 @@ export default function DevLayout({ children }: { children: React.ReactNode }) {
           DEV
         </span>
       </div>
+      <div className="flex flex-col gap-6 w-full max-w-3xl mx-auto">
       {children}
+      </div>
     </div>
   );
 }

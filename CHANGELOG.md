@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.3.0
+
+### 🚀 Enhancements
+
+- **db:** Add people and movie_people tables ([da363ff](https://github.com/alirezas/dot-movies/commit/da363ff))
+- Sync movie credits into people tables ([d96bff3](https://github.com/alirezas/dot-movies/commit/d96bff3))
+- Add person pages ([2db7831](https://github.com/alirezas/dot-movies/commit/2db7831))
+
+### 💅 Refactors
+
+- Share TVDB artwork URL helper ([669a1e8](https://github.com/alirezas/dot-movies/commit/669a1e8))
+
+### 📖 Documentation
+
+- Add CLAUDE.md with commands and architecture overview ([35263ae](https://github.com/alirezas/dot-movies/commit/35263ae))
+- Document person pages and people CLIs ([0d23181](https://github.com/alirezas/dot-movies/commit/0d23181))
+
+### ❤️ Contributors
+
+- Alireza Sarabchi ([@alirezas](https://github.com/alirezas))
+
 ## v1.2.0
 
 ### 🚀 Enhancements

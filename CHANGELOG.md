@@ -1,5 +1,32 @@
 # Changelog
 
+## v1.2.0
+
+### 🚀 Enhancements
+
+- **movie:** Netflix-style hero layout for the movie page ([78f5cea](https://github.com/alirezas/dot-movies/commit/78f5cea))
+- **movie:** Play trailers in a modal ([3201093](https://github.com/alirezas/dot-movies/commit/3201093))
+
+### 🩹 Fixes
+
+- **import:** Allow re-selecting the same file in the import form ([28e9600](https://github.com/alirezas/dot-movies/commit/28e9600))
+- **movie-card:** Let clicks pass through the border overlay ([f2908d2](https://github.com/alirezas/dot-movies/commit/f2908d2))
+
+### 🏡 Chore
+
+- **deps:** Update dependencies and add taze update script ([814e673](https://github.com/alirezas/dot-movies/commit/814e673))
+- Run dev server on port 6001 and allow movies.dot.test origin ([dbda61d](https://github.com/alirezas/dot-movies/commit/dbda61d))
+- Add Neon agent skills and ignore .neon ([f9493c8](https://github.com/alirezas/dot-movies/commit/f9493c8))
+
+### 🤖 CI
+
+- Use pnpm 12 and Node 24 to match local toolchain ([79c3543](https://github.com/alirezas/dot-movies/commit/79c3543))
+- Build on Vercel instead of the runner ([ae1c27f](https://github.com/alirezas/dot-movies/commit/ae1c27f))
+
+### ❤️ Contributors
+
+- Alireza Sarabchi ([@alirezas](https://github.com/alirezas))
+
 ## v1.1.0
 
 

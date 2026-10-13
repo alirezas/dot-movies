@@ -10,12 +10,13 @@ A Next.js application for tracking and managing your movie watchlist and watched
 - **Styling**: Tailwind CSS 4 with dark mode
 - **API**: TVDB v4 (auto-generated OpenAPI client)
 - **Linting/Formatting**: Biome
-- **CI/CD**: GitHub Actions + Vercel
+- **CI/CD**: GitHub Actions + Vercel (builds run on Vercel)
 - **Git Hooks**: Husky (pre-push validation)
 
 ## Features
 
-- Browse and view movie details with artwork carousel
+- Netflix-style movie page: full-bleed rotating backdrop, title logo, runtime/rating/genres, overview, cast and gallery rows
+- Watch trailers in a modal (YouTube/Vimeo embeds)
 - Maintain a personal watchlist
 - Track watched movies with date tracking
 - Infinite scroll pagination
@@ -27,12 +28,12 @@ A Next.js application for tracking and managing your movie watchlist and watched
 
 ### Prerequisites
 
-- Node.js 18+
-- pnpm
+- Node.js 24 (matches CI)
+- pnpm 12 (`pnpm-workspace.yaml` uses settings older pnpm versions can't read)
 
 ### Environment Variables
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root (the CLI tools read `.env`; Next.js also reads `.env.local`):
 
 ```env
 DATABASE_URL=your_neon_database_url
@@ -76,13 +77,27 @@ See [docs/README.md](docs/README.md) for detailed documentation.
 | `pnpm db:studio` | Open Drizzle Studio |
 | `pnpm generate:tvdb` | Regenerate TVDB API client |
 | `pnpm release` | Bump version, update changelog, commit & tag |
+| `pnpm update:deps` | Interactively update dependencies (taze) |
+| `pnpm letterboxd:import` | Import a Letterboxd export |
+| `pnpm movies:update-tvdb` | Refresh TVDB data for watched movies |
+| `pnpm watchlist:update-tvdb` | Refresh TVDB data for watchlist movies |
 
 ## Development Workflow
 
 - **`main`** is protected — direct pushes are blocked
 - Create a feature branch (e.g. `dev`), push changes, and open a PR to `main`
-- PRs must pass the **Lint, Type Check & Build** CI check before merging
-- Husky runs `pnpm lint && pnpm check && pnpm build` locally on every `git push`
+- PRs must pass the **Lint & Type Check** CI check before merging
+- Husky runs `pnpm lint && pnpm check && pnpm build` locally on `git push` (skipped on the `dev` branch)
+- `main` is squash-merged, so after a merge `dev` may need `git merge -s ours origin/main` to avoid phantom conflicts on the next PR (only when the two trees are identical)
+
+## Deployment
+
+The **Vercel Deploy** GitHub Actions workflow handles deploys:
+
+- **Pull requests** → preview deployment
+- **Push to `main`** → production deployment
+
+Deploys run `vercel deploy`, so the build happens on Vercel. `DATABASE_URL` and `TVDB_API_KEY` are stored as Vercel *Sensitive* variables, which `vercel pull` can't read (it writes the literal `[SENSITIVE]`), so don't switch back to building on the runner with `vercel build` + `--prebuilt`.
 
 ## Releasing
 

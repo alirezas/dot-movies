@@ -25,7 +25,7 @@ export function MovieCard({ movie, priority }: MovieCardProps) {
       className={cn(
         ["relative overflow-hidden w-full aspect-2/3 rounded-lg shadow-2xl"],
         [
-          "after:absolute after:z-10 after:inset-0 after:border after:mix-blend-color-dodge after:w-[calc(100%-1px)] after:h-[calc(100%-1px)] after:rounded-[calc(var(--radius-lg)-1px)] after:border-white/10",
+          "after:pointer-events-none after:absolute after:z-10 after:inset-0 after:border after:mix-blend-color-dodge after:w-[calc(100%-1px)] after:h-[calc(100%-1px)] after:rounded-[calc(var(--radius-lg)-1px)] after:border-white/10",
         ]
       )}
     >

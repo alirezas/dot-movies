@@ -47,7 +47,7 @@ pnpm db:push    # push schema to database
 pnpm dev        # start development server
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser.
+Open [http://localhost:6001](http://localhost:6001) with your browser.
 
 ## CLI Tools
 

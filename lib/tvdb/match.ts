@@ -15,8 +15,8 @@ export function normalizeTitle(title: string): string {
  * 1. an exact title match among results for that exact year
  * 2. an exact title match within ±1 year, since TVDB's year filter is exact
  *    and Letterboxd and TVDB sometimes disagree by a year
- * 3. TVDB's top result for that exact year
- * Throws when nothing qualifies.
+ * Throws when neither exists: TVDB's top result alone is usually a
+ * different film with a similar name, and no match beats a wrong one.
  */
 export async function findTvdbMovie(
   movieTitle: string,
@@ -56,7 +56,10 @@ export async function findTvdbMovie(
     if (nearYearMatch) return nearYearMatch;
   }
 
-  if (yearResults[0]) return yearResults[0];
-
-  throw new Error("No movie found");
+  const closest = yearResults[0];
+  throw new Error(
+    closest
+      ? `No exact title match (closest: ${closest.name} (${closest.year}))`
+      : "No movie found"
+  );
 }

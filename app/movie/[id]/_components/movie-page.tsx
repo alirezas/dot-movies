@@ -1,7 +1,8 @@
-import { Bookmark, Eye, Info, Play } from "lucide-react";
+import { Bookmark, Eye, Info } from "lucide-react";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { HeroBackdrop } from "@/app/movie/[id]/_components/hero-backdrop";
+import { TrailerButton } from "@/app/movie/[id]/_components/trailer-button";
 import type { MovieDetails } from "@/app/movie/[id]/_lib/movie-details";
 import { cn } from "@/lib/utils";
 
@@ -98,15 +99,7 @@ const MoviePage = ({ movie }: Props) => {
 
           <div className="flex flex-wrap gap-3 pt-1">
             {movie.trailerUrl && (
-              <a
-                href={movie.trailerUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-md bg-white px-6 py-2.5 font-semibold text-black text-lg transition-colors hover:bg-white/80"
-              >
-                <Play className="size-5 fill-current" />
-                Trailer
-              </a>
+              <TrailerButton url={movie.trailerUrl} title={movie.title} />
             )}
             {movie.letterboxdUrl && (
               <a

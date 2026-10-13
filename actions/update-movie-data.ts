@@ -4,7 +4,8 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { type Movie, movies } from "@/lib/db/schema";
 import { syncMovieCredits } from "@/lib/people/credits";
-import { getMovieExtended, getSearchResults } from "@/lib/tvdb/generated";
+import { getMovieExtended } from "@/lib/tvdb/generated";
+import { findTvdbMovie } from "@/lib/tvdb/match";
 
 export const updateMovieData = async (movieOrId: Movie | number) => {
   const movie =
@@ -18,37 +19,7 @@ export const updateMovieData = async (movieOrId: Movie | number) => {
     throw new Error("Movie not found");
   }
 
-  const searchQuery = await getSearchResults({
-    query: {
-      query: movie.title,
-      year: movie.releaseYear || undefined,
-      type: "movie",
-      limit: 1,
-    },
-  });
-
-  const searchResult = searchQuery.data?.data?.[0];
-
-  if (!searchResult) {
-    throw new Error("No movie found");
-  }
-
-  const searchYear = Number(searchResult.year);
-  const movieYear = movie.releaseYear;
-  const yearMatches =
-    !movieYear ||
-    !searchResult.year ||
-    searchYear === movieYear ||
-    Math.abs(searchYear - movieYear) <= 1;
-
-  if (!yearMatches) {
-    throw new Error(
-      `${movie.title} (${movie.releaseYear})` +
-        ` - ${searchResult.name} (${searchResult.year})` +
-        " - Year mismatch"
-    );
-  }
-
+  const searchResult = await findTvdbMovie(movie.title, movie.releaseYear);
   const tvdbId = Number(searchResult.id?.split("-")[1]);
 
   const extendedMovieQuery = await getMovieExtended({

@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   date,
   index,
@@ -19,11 +20,15 @@ export const movies = pgTable(
     letterboxdUrl: text("letterboxd_url"),
     watchedDate: date("watched_date"),
     tvdbData: jsonb("tvdb_data").$type<MovieExtendedRecord>(),
+    tvdbId: integer("tvdb_id").generatedAlwaysAs(
+      sql`(tvdb_data->>'id')::integer`
+    ),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => ({
     watchedDateIdx: index("watched_date_idx").on(table.watchedDate),
+    tvdbIdIdx: index("tvdb_id_idx").on(table.tvdbId),
   })
 );
 

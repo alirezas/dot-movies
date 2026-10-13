@@ -43,6 +43,13 @@
       "when": 1773937592703,
       "tag": "0005_groovy_thunderbolt_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791916290007,
+      "tag": "0006_futuristic_siren",
+      "breakpoints": true
     }
   ]
 }

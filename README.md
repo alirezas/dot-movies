@@ -57,6 +57,8 @@ The project includes CLI tools for data management:
 - **Import from Letterboxd**: `pnpm letterboxd:import <directory>`
 - **Update watched movies with TVDB data**: `pnpm movies:update-tvdb`
 - **Update watchlist movies with TVDB data**: `pnpm watchlist:update-tvdb`
+- **Rebuild people and credits from stored TVDB data**: `pnpm people:backfill`
+- **Fetch TVDB profiles for people**: `pnpm people:update-tvdb`
 
 See [docs/README.md](docs/README.md) for detailed documentation.
 
@@ -81,6 +83,8 @@ See [docs/README.md](docs/README.md) for detailed documentation.
 | `pnpm letterboxd:import` | Import a Letterboxd export |
 | `pnpm movies:update-tvdb` | Refresh TVDB data for watched movies |
 | `pnpm watchlist:update-tvdb` | Refresh TVDB data for watchlist movies |
+| `pnpm people:backfill` | Rebuild people and credits from stored TVDB data |
+| `pnpm people:update-tvdb` | Fetch missing or stale TVDB person profiles |
 
 ## Development Workflow
 

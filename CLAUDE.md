@@ -12,7 +12,7 @@ Package manager is **pnpm 12** (older pnpm can't read `pnpm-workspace.yaml`); No
 - `pnpm build`: production build. It needs `DATABASE_URL` and `TVDB_API_KEY`, because `lib/db/index.ts` and `lib/env.ts` throw at import time when they're missing.
 - `pnpm db:generate` → `pnpm db:migrate` after editing `lib/db/schema/*` (`db:push` for quick local syncing)
 - `pnpm generate:tvdb`: regenerates `lib/tvdb/generated/` from TVDB's OpenAPI spec. Don't hand-edit the generated files.
-- CLI: `pnpm letterboxd:import <dir>`, `pnpm movies:update-tvdb`, `pnpm watchlist:update-tvdb`
+- CLI: `pnpm letterboxd:import <dir>`, `pnpm movies:update-tvdb`, `pnpm watchlist:update-tvdb`, `pnpm people:backfill`, `pnpm people:update-tvdb`
 
 There is no test suite.
 
@@ -20,7 +20,7 @@ There is no test suite.
 
 Next.js 16 App Router + React 19, with `cacheComponents: true`. That makes data fetching in pages Suspense-driven: pages render a skeleton fallback and stream an async server component.
 
-**Data model.** There is a single `movies` table (`lib/db/schema/movies.ts`). "Watched" vs "watchlist" isn't a separate table or flag. It's derived from `watchedDate`: non-null means watched, null means watchlist. All TVDB metadata lives in the `tvdb_data` jsonb column, typed as the generated `MovieExtendedRecord`. `import_logs` / `import_log_entries` track web-based imports.
+**Data model.** Movies live in a single `movies` table (`lib/db/schema/movies.ts`). "Watched" vs "watchlist" isn't a separate table or flag. It's derived from `watchedDate`: non-null means watched, null means watchlist. All TVDB metadata lives in the `tvdb_data` jsonb column, typed as the generated `MovieExtendedRecord`; `tvdb_id` is a generated column extracted from it. `import_logs` / `import_log_entries` track web-based imports.
 
 **DB access.** `lib/db` uses Drizzle over `@neondatabase/serverless` (HTTP driver). Read queries live in `lib/queries/*` and are wrapped in React `cache()`.
 
@@ -28,7 +28,9 @@ Next.js 16 App Router + React 19, with `cacheComponents: true`. That makes data 
 
 **Movie detail.** `app/movie/[id]/_lib/movie-details.ts` turns the raw `tvdbData` blob into a `MovieDetails` view model (artwork picked by TVDB artwork type IDs, cast, trailers, and so on). Route-private code goes in `_components` / `_lib` folders.
 
-**TVDB enrichment.** The `updateMovieData` server action (`actions/update-movie-data.ts`) searches TVDB by title and year, allows ±1 year of mismatch, fetches the extended record and stores it in `tvdb_data`. It's shared by the CLI update scripts and the dev refresh button. Auth for the generated client lives in `lib/tvdb/runtime-config.ts`, which logs in with the API key and caches the bearer token.
+**TVDB enrichment.** The `updateMovieData` server action (`actions/update-movie-data.ts`) searches TVDB by title and year, allows ±1 year of mismatch, fetches the extended record and stores it in `tvdb_data`. It's shared by the CLI update scripts and the dev refresh button. It then calls `syncMovieCredits` (`lib/people/credits.ts`), which mirrors the record's actors and directors into `people` / `movie_people` (keyed by TVDB people id). `pnpm people:backfill` rebuilds those tables from stored `tvdb_data` without calling TVDB.
+
+**Person pages.** `/person/[id]` lists the person's library movies from `movie_people`. Bio, life dates and the "Other films" filmography come from TVDB's person record, which is cached on the `people` row. `getPersonProfile` (`lib/people/profile.ts`) refetches it when it's missing or more than 30 days old and saves it with `after()`. Auth for the generated client lives in `lib/tvdb/runtime-config.ts`, which logs in with the API key and caches the bearer token.
 
 **Letterboxd import.** Core logic is in `lib/import/letterboxd.ts`, which parses the CSVs, merges watched and watchlist records, and diffs against existing rows. It takes an `ImportLogger` interface, so two front ends share it:
 - the CLI (`cli/import-letterboxd.ts`, which uses terminal progress helpers from `cli/utils.ts`)

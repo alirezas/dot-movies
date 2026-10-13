@@ -1,4 +1,5 @@
 import type { Movie } from "@/lib/db/schema/movies";
+import { absoluteImageUrl } from "@/lib/tvdb/artwork";
 import type { ArtworkBaseRecord } from "@/lib/tvdb/generated";
 
 // TVDB artwork type ids (see /artwork/types)
@@ -7,8 +8,6 @@ const ARTWORK_TYPE = {
   background: 15,
   clearLogo: 25,
 } as const;
-
-const TVDB_ARTWORK_HOST = "https://artworks.thetvdb.com";
 
 export type CastMember = {
   id: number;
@@ -35,12 +34,6 @@ export type MovieDetails = {
   poster: string | null;
   trailerUrl: string | null;
 };
-
-function absoluteImageUrl(url: string | undefined | null): string | null {
-  if (!url) return null;
-  if (url.startsWith("http")) return url;
-  return `${TVDB_ARTWORK_HOST}${url.startsWith("/") ? "" : "/"}${url}`;
-}
 
 function byPreference(a: ArtworkBaseRecord, b: ArtworkBaseRecord): number {
   const aEng = a.language === "eng" ? 0 : 1;

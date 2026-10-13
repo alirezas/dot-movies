@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     APP_VERSION: version,
   },
   cacheComponents: true,
+  allowedDevOrigins: ["movies.dot.test"],
   turbopack: {
     root: __dirname,
   },

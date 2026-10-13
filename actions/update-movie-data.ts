@@ -3,6 +3,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { type Movie, movies } from "@/lib/db/schema";
+import { syncMovieCredits } from "@/lib/people/credits";
 import { getMovieExtended, getSearchResults } from "@/lib/tvdb/generated";
 
 export const updateMovieData = async (movieOrId: Movie | number) => {
@@ -70,6 +71,8 @@ export const updateMovieData = async (movieOrId: Movie | number) => {
     })
     .where(eq(movies.id, movie.id))
     .returning();
+
+  await syncMovieCredits(movie.id, extendedMovieData);
 
   return updatedMovie[0];
 };

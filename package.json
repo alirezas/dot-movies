@@ -17,6 +17,7 @@
     "letterboxd:import": "tsx cli/import-letterboxd.ts",
     "movies:update-tvdb": "tsx cli/update-watched-movies.ts",
     "watchlist:update-tvdb": "tsx cli/update-watchlist-movies.ts",
+    "people:backfill": "tsx cli/backfill-people.ts",
     "generate:tvdb": "openapi-ts",
     "release": "changelogen --bump",
     "prepare": "husky",

@@ -1,5 +1,6 @@
 import { Bookmark, Eye, Info } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { HeroBackdrop } from "@/app/movie/[id]/_components/hero-backdrop";
 import { TrailerButton } from "@/app/movie/[id]/_components/trailer-button";
@@ -149,17 +150,16 @@ const MoviePage = ({ movie }: Props) => {
             {movie.directors.length > 0 && (
               <>
                 <dt className="text-muted-foreground">Directed by</dt>
-                <dd>{movie.directors.join(", ")}</dd>
+                <dd>
+                  <PersonLinks people={movie.directors} />
+                </dd>
               </>
             )}
             {movie.cast.length > 0 && (
               <>
                 <dt className="text-muted-foreground">Starring</dt>
                 <dd>
-                  {movie.cast
-                    .slice(0, 4)
-                    .map((p) => p.name)
-                    .join(", ")}
+                  <PersonLinks people={movie.cast.slice(0, 4)} />
                 </dd>
               </>
             )}
@@ -203,7 +203,10 @@ function CastCard({ person }: { person: MovieDetails["cast"][number] }) {
     .join("");
 
   return (
-    <div className="group relative aspect-2/3 w-36 shrink-0 snap-start overflow-hidden rounded-md bg-muted md:w-40">
+    <Link
+      href={`/person/${person.id}`}
+      className="group relative aspect-2/3 w-36 shrink-0 snap-start overflow-hidden rounded-md bg-muted md:w-40"
+    >
       {person.image ? (
         <Image
           src={person.image}
@@ -223,8 +226,22 @@ function CastCard({ person }: { person: MovieDetails["cast"][number] }) {
           <p className="truncate text-white/70 text-xs">{person.character}</p>
         )}
       </div>
-    </div>
+    </Link>
   );
+}
+
+function PersonLinks({ people }: { people: { id: number; name: string }[] }) {
+  return people.map((person, i) => (
+    <span key={person.id}>
+      {i > 0 && ", "}
+      <Link
+        href={`/person/${person.id}`}
+        className="underline-offset-4 hover:underline"
+      >
+        {person.name}
+      </Link>
+    </span>
+  ));
 }
 
 export default MoviePage;

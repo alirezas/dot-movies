@@ -27,7 +27,7 @@ export type MovieDetails = {
   runtime: string | null;
   contentRating: string | null;
   genres: string[];
-  directors: string[];
+  directors: { id: number; name: string }[];
   cast: CastMember[];
   backdrops: string[];
   logo: { src: string; width: number; height: number } | null;
@@ -93,19 +93,25 @@ export function getMovieDetails(movie: Movie): MovieDetails {
       (a.sort ?? Number.MAX_SAFE_INTEGER) - (b.sort ?? Number.MAX_SAFE_INTEGER)
   );
 
-  const cast: CastMember[] = people
-    .filter((c) => c.peopleType === "Actor" && c.personName)
-    .slice(0, 20)
-    .map((c, i) => ({
-      id: c.id ?? i,
-      name: c.personName as string,
+  // Keyed by person so an actor with several roles appears once
+  const castById = new Map<number, CastMember>();
+  for (const c of people) {
+    if (c.peopleType !== "Actor" || !c.peopleId || !c.personName) continue;
+    if (castById.has(c.peopleId)) continue;
+    castById.set(c.peopleId, {
+      id: c.peopleId,
+      name: c.personName,
       character: c.name || null,
       image: absoluteImageUrl(c.personImgURL ?? c.image),
-    }));
+    });
+  }
+  const cast = [...castById.values()].slice(0, 20);
 
-  const directors = people
-    .filter((c) => c.peopleType === "Director" && c.personName)
-    .map((c) => c.personName as string);
+  const directors = new Map(
+    people
+      .filter((c) => c.peopleType === "Director" && c.peopleId && c.personName)
+      .map((c) => [c.peopleId as number, c.personName as string])
+  );
 
   const contentRating =
     tvdb?.contentRatings?.find((r) => r.country === "usa")?.name ?? null;
@@ -128,7 +134,7 @@ export function getMovieDetails(movie: Movie): MovieDetails {
       .map((g) => g.name)
       .filter((name): name is string => Boolean(name))
       .slice(0, 3),
-    directors: [...new Set(directors)],
+    directors: [...directors].map(([id, name]) => ({ id, name })),
     cast,
     backdrops,
     logo: logoSrc

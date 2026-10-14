@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.3.1
+
+### 🩹 Fixes
+
+- **tvdb:** Match movies by exact title before TVDB's top result ([5b033db](https://github.com/alirezas/dot-movies/commit/5b033db))
+- **tvdb:** Require an exact title match when matching movies ([0f16e5a](https://github.com/alirezas/dot-movies/commit/0f16e5a))
+
+### 📖 Documentation
+
+- Describe TVDB title matching ([3e2c231](https://github.com/alirezas/dot-movies/commit/3e2c231))
+
+### ❤️ Contributors
+
+- Alireza Sarabchi ([@alirezas](https://github.com/alirezas))
+
 ## v1.3.0
 
 ### 🚀 Enhancements
